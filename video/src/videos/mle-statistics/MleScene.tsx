@@ -17,7 +17,8 @@ const R_X0 = 1000;
 /**
  * Question 11. A likelihood over a click rate, its peak marked; the log,
  * because 2,000 halves multiply to exactly zero in float64 while their log
- * is −1,386.29; the two losses it becomes (squared error, log loss); and the
+ * is −1,386.29 (and the log only rises, so the peak stays put); the two
+ * losses it becomes (squared error, log loss); and the
  * catch: three clicks in three views peak at 100% (red), while one pretend
  * click and one pretend skip, a prior, give four in five (the curve already
  * on the page, now green), as L2 is a normal prior on the weights.
@@ -34,9 +35,10 @@ export const MleScene: React.FC = () => {
   const probableAt = n.word("q11", "most probable");
   const logAt = n.word("q11-log", "You maximize the log");
   const underflowAt = n.word("q11-log", "the product underflows");
-  const halfAt = n.word("q11-log", "a probability of one half");
-  const zeroAt = n.word("q11-log", "exactly zero");
-  const minusAt = n.word("q11-log", "minus thirteen hundred");
+  const peakAt = n.word("q11-log-peak", "The log only ever rises");
+  const halfAt = n.word("q11-log-zero", "a probability of one half");
+  const zeroAt = n.word("q11-log-zero", "exactly zero");
+  const minusAt = n.word("q11-log-zero", "minus thirteen hundred");
   const normalAt = n.word("q11-loss", "For a normal model");
   const squaresAt = n.word("q11-loss", "least squares");
   const logisticAt = n.word("q11-loss", "For logistic regression");
@@ -80,17 +82,27 @@ export const MleScene: React.FC = () => {
         </Line>
 
         {/* ── The likelihood over a click rate ── */}
-        <Heading at={pickAt + 6} x={X0} y={y(370)}>
+        <Heading at={pickAt + 6} out={smallAt} x={X0} y={y(370)}>
           Likelihood of <Num>4</Num> clicks in <Num>5</Num> views
+        </Heading>
+        {/* Once the 3-in-3 curve joins it, the green one is no longer a
+            likelihood of what was seen, so the heading stops naming it. */}
+        <Heading at={smallAt + 8} x={X0} y={y(370)}>
+          Likelihood by click rate
         </Heading>
         <Curve points={smooth} at={pickAt + 8} dur={26} color={curveColor} width={3.2} />
         <Baseline x0={X0} x1={P_X1} base={base} at={pickAt + 6} ticks={[0, 0.25, 0.5, 0.75, 1].map((v) => ({ v, x: px(v), text: `${v * 100}%` }))} title="Click rate" />
-        <Svg opacity={ease(frame, probableAt, 12)}>
+        <Svg opacity={ease(frame, probableAt, 12) * (1 - ease(frame, threeAt, 10))}>
           <line x1={px(MLE.smoothed)} x2={px(MLE.smoothed)} y1={base} y2={base - height - h(20)} stroke={POINT} strokeWidth={3} strokeDasharray="7 5" />
         </Svg>
-        <Line at={probableAt + 4} x={px(MLE.smoothed) - 14} y={base - height - h(30)} size={22} align="right" width={400}>
+        <Line at={probableAt + 4} out={threeAt} x={px(MLE.smoothed) - 14} y={base - height - h(30)} size={22} align="right" width={400}>
           <Mark at={probableAt + 8}>Maximum likelihood</Mark>
         </Line>
+        {/* Each curve's peak, in the color of the line under the chart that names it. */}
+        <Svg>
+          <circle cx={px(MLE.grid[MLE.grid.length - 1])} cy={base - height} r={8 * ease(frame, hundredAt, 10)} fill={BAD} />
+          <circle cx={px(MLE.smoothed)} cy={base - height} r={8 * ease(frame, fourAt, 10)} fill={OK} />
+        </Svg>
         {/* The small sample: three in three, piling against 100%. */}
         <Curve points={raw} at={threeAt + 4} dur={24} color={BAD} width={3.2} />
         <Line at={hundredAt} x={X0} y={y(792)} size={26} color={BAD_INK} weight={600}>
@@ -112,7 +124,10 @@ export const MleScene: React.FC = () => {
         <Heading at={underflowAt - 6} x={R_X0} y={y(370)}>
           The log, because the product underflows
         </Heading>
-        <Ink at={halfAt} dur={14} style={{ left: R_X0, top: y(424), whiteSpace: "nowrap" }}>
+        <Line at={peakAt} x={R_X0} y={y(412)} size={22} color={INK_SOFT}>
+          The log only ever rises, so the peak stays put
+        </Line>
+        <Ink at={halfAt} dur={14} style={{ left: R_X0, top: y(460), whiteSpace: "nowrap" }}>
           <span style={{ ...note(26, INK) }}>
             <MathRun>0.5 × 0.5 × ⋯ × 0.5</MathRun> (<Num>{MLE.labels.toLocaleString("en-US")}</Num> labels){" "}
             <span style={{ opacity: ease(frame, zeroAt - 2, 10), color: BAD_INK, fontWeight: 600 }}>
@@ -120,7 +135,7 @@ export const MleScene: React.FC = () => {
             </span>
           </span>
         </Ink>
-        <Ink at={minusAt - 4} dur={14} style={{ left: R_X0, top: y(476), whiteSpace: "nowrap" }}>
+        <Ink at={minusAt - 4} dur={14} style={{ left: R_X0, top: y(508), whiteSpace: "nowrap" }}>
           <span style={{ ...note(26, OK_INK), fontWeight: 600 }}>
             Its log:{" "}
             <MathRun>

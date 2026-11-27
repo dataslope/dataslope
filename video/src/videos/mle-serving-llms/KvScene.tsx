@@ -1,6 +1,6 @@
 import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
-import { arrowHead, cubicPath, sampleCubic, type Cubic } from "../../components/arrow";
+import { arrowHead, cubicPath, lineLength, sampleCubic, type Cubic } from "../../components/arrow";
 import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
@@ -38,11 +38,17 @@ import {
 const PAST = ["Serving", "a", "large", "model", "is", "mostly"];
 const NEW = "memory";
 const SLOT = 168;
+/** The attention arcs' arrowhead length. */
+const HEAD = 12;
 /** The node bar's scale: 640 GB across 1,600 px. */
 const PX_PER_GB = 2.5;
 const GIB = 2 ** 30;
 /** A 128K context and an 8K request with 64 KV heads, in GB. */
 const ctxGB = (KV.context128kGiB * GIB) / 1e9;
+/** The grouped-query sketch: one query head's box, and its left edge. */
+const Q_W_BOX = 34;
+const Q_PITCH = 42;
+const qX = (i: number) => 1630 - ((KV.gqaFactor - 1) * Q_PITCH + Q_W_BOX) / 2 + i * Q_PITCH;
 const per8kGB = KV.per8kBytes / 1e9;
 
 /**
@@ -151,6 +157,11 @@ export const KvScene: React.FC = () => {
   const phase11 = ease(frame, elevenAt, 1) * (1 - ease(frame, gqaAt, 1));
   const phase23 = ease(frame, timesAt + 4, 1);
   const cellsFrom = phase11 > 0 ? elevenAt : phase23 > 0 ? timesAt + 4 : frame >= gqaAt ? gqaAt : fitAt;
+  // The caption under the cells, one per fill, cross-faded on the cells' cues.
+  const cap8 =
+    Math.min(ease(frame, at8kAt, 12), 1 - ease(frame, elevenAt - 2, 8)) + Math.min(ease(frame, gqaAt, 12), 1 - ease(frame, timesAt + 2, 8));
+  const cap128 = Math.min(ease(frame, elevenAt + 4, 10), 1 - ease(frame, gqaAt - 2, 8));
+  const cap64 = ease(frame, timesAt + 6, 10);
   const cells =
     phase11 > 0
       ? { count: KV.fit128k, gb: ctxGB, rows: 1 }
@@ -212,10 +223,15 @@ export const KvScene: React.FC = () => {
               if (p <= 0) return null;
               const line = [...sampleCubic(c), ...Array.from({ length: 11 }, (_, k) => [ex, yy - STRAIGHT + (STRAIGHT * (k + 1)) / 11] as const)];
               const d = `${cubicPath(c)} L${ex},${yy}`;
+              // The stroke stops a head-length short of the tip, so it meets
+              // the head on every arc (a fixed 96% left the long arcs 20 to
+              // 45 px short of theirs).
+              const len = lineLength(line);
+              const reach = (len - HEAD + 1) / len;
               return (
                 <g key={i} opacity={1 - 0.45 * ease(frame, recompAt, 12)}>
-                  <path d={d} fill="none" stroke={INK} strokeWidth={2} pathLength={1} strokeDasharray={`${p * 0.96} 1`} />
-                  <path d={arrowHead(line, 12, 6.4, { filled: true })} fill={INK} opacity={ease(frame, attendsAt + 12 + (PAST.length - 1 - i) * 3, 5)} />
+                  <path d={d} fill="none" stroke={INK} strokeWidth={2} pathLength={1} strokeDasharray={`${p * reach} 1`} />
+                  <path d={arrowHead(line, HEAD, 6.4, { filled: true })} fill={INK} opacity={ease(frame, attendsAt + 12 + (PAST.length - 1 - i) * 3, 5)} />
                 </g>
               );
             })}
@@ -335,7 +351,7 @@ export const KvScene: React.FC = () => {
         <Line at={gpusAt} x={barX} y={nodeTop - h(46)} size={24} color={INK}>
           <Num>{KV.gpus}</Num> × <Num>{KV.gpuGB}</Num> GB = <Num>{KV.nodeGB}</Num> GB
         </Line>
-        <Line at={fitQAt - 4} x={barX + 1000} y={nodeTop - h(46)} size={24} color={INK_SOFT} out={gpusAt - 6}>
+        <Line at={fitQAt - 4} x={barX} y={y(806)} size={32} color={INK_SOFT} out={fitAt - 12}>
           How many requests fit?
         </Line>
         <Svg>
@@ -399,13 +415,26 @@ export const KvScene: React.FC = () => {
           <Mark at={freeAt + 6}>
             <Num>{KV.freeGB}</Num> GB free
           </Mark>
-          <span style={{ color: INK_SOFT, opacity: ease(frame, at8kAt, 12) }}> · <Num>8</Num>K tokens a request: <Num>{KV.per8kGiB}</Num> GiB each</span>
+          <span style={{ color: INK_SOFT, opacity: ease(frame, at8kAt, 12) }}> · </span>
+          {/* One caption per fill, stacked in one grid cell so the line keeps its place. */}
+          <span style={{ display: "inline-grid", color: INK_SOFT, verticalAlign: "top" }}>
+            <span style={{ gridArea: "1 / 1", opacity: cap8 }}>
+              <Num>8</Num>K tokens a request: <Num>{KV.per8kGiB}</Num> GiB = <Num>{KV.per8kGB}</Num> GB each
+            </span>
+            <span style={{ gridArea: "1 / 1", opacity: cap128 }}>
+              <Num>128</Num>K tokens a request: <Num>{KV.context128kGiB}</Num> GiB each
+            </span>
+            <span style={{ gridArea: "1 / 1", opacity: cap64 }}>
+              <Num>8</Num>K tokens, <Num>{KV.queryHeads}</Num> KV heads: <Num>{KV.per8kNoGqaGiB}</Num> GiB each
+            </span>
+          </span>
         </div>
 
         {/* ── The count, then the long context, then grouped-query attention ── */}
         <Clear at={elevenAt - 4}>
           <Line at={fitAt} x={barX} y={y(806)} size={32}>
             At most <b style={{ color: BLUE_INK, fontWeight: 600 }}><Num>{KV.fit8k}</Num></b> requests of <Num>8</Num>K tokens
+            <span style={{ color: INK_SOFT, opacity: ease(frame, fitAt + 20, 12) }}>, before activations and runtime overhead</span>
           </Line>
         </Clear>
         <Clear at={gqaAt - 4}>
@@ -430,37 +459,37 @@ export const KvScene: React.FC = () => {
         {/* ── Grouped-query attention: query heads share a key and value head ── */}
         <Enter at={gqaAt}>
           <Svg>
-            {Array.from({ length: 4 }, (_, i) => {
-              const qx = 1480 + i * 80;
-              const p = ease(frame, gqaAt + 4 + i * 3, 10);
-              const lp = ease(frame, shareAt + i * 3, 12);
+            {Array.from({ length: KV.gqaFactor }, (_, i) => {
+              const qx = qX(i);
+              const p = ease(frame, gqaAt + 4 + i * 2, 10);
+              const lp = ease(frame, shareAt + i * 2, 12);
               const ly = y(300) + 56;
               const tx = 1630;
               const ty = y(420) - 2;
               return (
                 <g key={i}>
-                  <line x1={qx + 30} y1={ly} x2={qx + 30 + (tx - qx - 30) * lp} y2={ly + (ty - ly) * lp} stroke={INK} strokeWidth={2} opacity={lp} />
-                  <rect x={qx} y={y(300)} width={60} height={54} rx={8} fill="none" stroke={INK} strokeWidth={2} opacity={p} />
+                  <line x1={qx + Q_W_BOX / 2} y1={ly} x2={qx + Q_W_BOX / 2 + (tx - qx - Q_W_BOX / 2) * lp} y2={ly + (ty - ly) * lp} stroke={INK} strokeWidth={2} opacity={lp} />
+                  <rect x={qx} y={y(300)} width={Q_W_BOX} height={54} rx={6} fill="none" stroke={INK} strokeWidth={2} opacity={p} />
                 </g>
               );
             })}
             <rect x={1562} y={y(420)} width={136} height={54} rx={8} fill="none" stroke={OK} strokeWidth={2} opacity={ease(frame, shareAt, 12)} />
           </Svg>
-          {Array.from({ length: 4 }, (_, i) => (
+          {Array.from({ length: KV.gqaFactor }, (_, i) => (
             <div
               key={i}
               style={{
                 position: "absolute",
-                left: 1480 + i * 80,
+                left: qX(i),
                 top: y(300),
-                width: 60,
+                width: Q_W_BOX,
                 height: 54,
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                ...label(24, INK),
+                ...label(22, INK),
                 fontWeight: 500,
-                opacity: ease(frame, gqaAt + 4 + i * 3, 10),
+                opacity: ease(frame, gqaAt + 4 + i * 2, 10),
               }}
             >
               Q
@@ -484,7 +513,7 @@ export const KvScene: React.FC = () => {
             K, V
           </div>
           <Line at={shareAt + 10} x={1630} width={400} align="center" y={y(420) + 66} size={22} color={INK_SOFT}>
-            one shared key and value head
+            shared by <Num>{KV.gqaFactor}</Num> query heads
           </Line>
         </Enter>
       </Drift>

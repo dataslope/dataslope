@@ -47,6 +47,10 @@ export const KV = results.kv as {
   per8kBytes: number;
   /** 2.5 */
   per8kGiB: number;
+  /** 2.68: the same request in decimal GB, why 500 GB holds 186, not 200. */
+  per8kGB: number;
+  /** 20: an 8K request with 64 KV heads (the 23 cells). */
+  per8kNoGqaGiB: number;
   /** 186: the block's last line. */
   fit8k: number;
   /** 11 */
@@ -81,6 +85,10 @@ export const PAGING = results.paging as {
   blockTokens: number;
   worstWasteTokens: number;
   worstWasteShare: number;
+  /** 125: blocks of 16 for 2,000 tokens. */
+  blocksUsed: number;
+  /** 16: the last block ends full (2,000 = 125 × 16). */
+  lastBlockTokens: number;
 };
 
 /** "q3-sim": the batching simulation (seed 7). Busy shares are of slot-steps

@@ -141,6 +141,10 @@ export const BatchScene: React.FC = () => {
         <Ink at={lookupAt} dur={12} style={{ left: NOTE_X, top: rowY(0) + h(80), whiteSpace: "nowrap" }}>
           <span style={{ ...note(22, BLUE_INK), fontWeight: 500 }}>Lookup: fast</span>
         </Ink>
+        {/* What a fast lookup buys: the heavy model runs offline. */}
+        <Line at={heavyAt} x={NOTE_X} y={rowY(0) + h(118)} size={21} color={INK_SOFT}>
+          So it suits a heavy model
+        </Line>
         <Line at={cheapAt} x={X0} y={y(516)} size={21} color={INK_SOFT}>
           Cheap and simple
         </Line>

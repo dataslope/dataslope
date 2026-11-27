@@ -100,9 +100,12 @@ export const LayersScene: React.FC = () => {
   ];
 
   const agreeAt = n.word("q1-agree", "have to agree");
-  const winsAt = n.word("q1-agree", "wins offline");
-  const fixAt = n.word("q1-agree", "fix the eval set");
-  const caresAt = n.word("q1-agree", "users don't care about");
+  const winsAt = n.word("q1-agree-fix", "wins offline");
+  /** The condition: an online loss on latency or cost is not the eval
+   *  set's fault, so the guardrails have to have held. */
+  const heldAt = n.word("q1-agree-fix", "the guardrails held");
+  const fixAt = n.word("q1-agree-fix", "fix the eval set");
+  const caresAt = n.word("q1-agree-fix", "users don't care about");
 
   const benchAt = n.word("q1-bench", "public benchmarks");
   const weakAt = n.word("q1-bench", "a weak guide");
@@ -145,8 +148,10 @@ export const LayersScene: React.FC = () => {
         <Sfx key={g.text} name="el-tap" at={g.at} level={-33} />
       ))}
       <Sfx name="el-pencil" at={agreeAt + 4} level={-35} />
+      <Sfx name="el-tap" at={heldAt + 2} level={-33} />
       <Sfx name="el-chime" at={caresAt + 10} level={-33} />
       <Sfx name="el-pop" at={benchAt + 2} level={-32} />
+      <Sfx name="el-pop" at={leanAt} level={-33} />
 
       <Drift from={from} to={end + 40}>
         <QuestionCard n={1} at={qAt - 4} textAt={textAt - 4} size={60}>
@@ -165,7 +170,7 @@ export const LayersScene: React.FC = () => {
           const lit = during(frame, starts[i] - 4, starts[i + 1] - 4, 8);
           return (
             <div key={i} style={{ position: "absolute", left: DISC_X - 1, top: ry(i) - 23, opacity: ease(frame, layersAt + 4 + i * 3, 10) }}>
-              <Disc n={i + 1} size={46} text={26} tone="green" lit={lit} />
+              <Disc n={i + 1} size={46} text={26} lit={lit} />
             </div>
           );
         })}
@@ -192,7 +197,9 @@ export const LayersScene: React.FC = () => {
           real failures
         </Line>
 
-        {/* Rung 2: scoring matched to the task. The judge chip stays. */}
+        {/* Rung 2: scoring matched to the task. The judge chip stays through
+            rung 3, which checks it, then leaves with rung 3's notes and comes
+            back lit on "lean on an LLM judge", the turn to question 2. */}
         <Box
           r={exact}
           at={exactAt}
@@ -206,6 +213,7 @@ export const LayersScene: React.FC = () => {
         <Box
           r={judge}
           at={judgeAt}
+          out={ciAt - 4}
           title="Rubric LLM judge"
           sub="open-ended text"
           size={24}
@@ -213,10 +221,9 @@ export const LayersScene: React.FC = () => {
             { at: needsAt, tone: "lit" },
             { at: humanAt - 4, tone: "plain" },
             { at: checkAt, tone: "lit" },
-            { at: ciAt - 4, tone: "plain" },
-            { at: leanAt, tone: "lit" },
           ]}
         />
+        <Box r={judge} at={leanAt - 2} title="Rubric LLM judge" sub="open-ended text" size={24} tone="lit" />
         {/* The assistant's two outputs, each led to what grades it. */}
         <Line x={exact.cx} width={420} align="center" y={itemY} at={ticketAt} out={humanAt - 4} size={24}>
           Ticket filed with the right fields
@@ -279,6 +286,9 @@ export const LayersScene: React.FC = () => {
         />
         <Line x={BACK_X + 36} y={ry(4) - 17} at={winsAt + 6} size={26} color={BAD_INK}>
           Wins offline, loses online
+        </Line>
+        <Line x={BACK_X + 36} y={ry(4) + 25} at={heldAt} size={22} color={INK_SOFT} weight={500}>
+          Guardrails held
         </Line>
         <Line x={BACK_X + 36} y={ry(0) - 17} at={fixAt} size={26} color={GOOD_INK}>
           Fix the eval set

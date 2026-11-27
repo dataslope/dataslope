@@ -163,6 +163,9 @@ export const DropScene: React.FC = () => {
 
         {/* ── Left on: ten calls, one image ── */}
         <Pixels values={DROPOUT.image.pixels} x={R_X} y={y(330)} cell={11} gap={0} at={leaveAt} />
+        <Line at={leaveAt + 4} x={R_X} y={y(330) + 8 * 11 + h(12)} size={20} color={INK_SOFT}>
+          A test <Num>{DROPOUT.image.label}</Num>
+        </Line>
         <Line at={leaveAt + 4} x={CALL_X} y={y(320)} size={24} color={OK_INK}>
           Evaluation mode: <Num>{DROPOUT.image.evalClass}</Num> at <Num>{Math.round(DROPOUT.image.evalP * 100)}</Num>%, every call
         </Line>

@@ -29,9 +29,10 @@ const LIST_Y = 318;
 const ROW_STEP = 108;
 const MORE_Y = LIST_Y + 4 * ROW_STEP + 30;
 const NAME_SIZE = 28;
-/** In px, from a row's rule. */
-const NAME_DY = 28;
-const TOPICS_DY = 78;
+/** In px, from a row's rule: the name 29px under it (the house minimum is
+ *  28), the topics 27px under the name and about 23px over the next rule. */
+const NAME_DY = 22;
+const TOPICS_DY = 72;
 
 type Topic = { text: string; at: number };
 

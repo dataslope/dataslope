@@ -136,12 +136,12 @@ const Kmeans: React.FC<{ c: Ctx }> = ({ c }) => {
         {KMEANS.x.map((v, i) => {
           const p = ease(frame, startAt + (i / KMEANS.x.length) * 16, 8);
           if (p <= 0) return null;
-          return <Shape key={i} kind={KMEANS.truth[i]} x={at(sx, v)} y={at(sy, KMEANS.y[i])} r={3.6 * p} color={KCOL[MATCH[KMEANS.assigned[i]]]} />;
+          return <Shape key={i} kind={KMEANS.truth[i]} x={at(sx, v)} y={at(sy, KMEANS.y[i])} r={4.8 * p} color={KCOL[MATCH[KMEANS.assigned[i]]]} />;
         })}
       </Svg>
       <Svg opacity={ease(frame, wrongAt, 12)}>
         {KMEANS.x.map((v, i) =>
-          MATCH[KMEANS.assigned[i]] !== KMEANS.truth[i] ? <circle key={i} cx={at(sx, v)} cy={at(sy, KMEANS.y[i])} r={7} fill="none" stroke={ACCENT} strokeWidth={1.6} /> : null,
+          MATCH[KMEANS.assigned[i]] !== KMEANS.truth[i] ? <circle key={i} cx={at(sx, v)} cy={at(sy, KMEANS.y[i])} r={8.4} fill="none" stroke={ACCENT} strokeWidth={1.6} /> : null,
         )}
       </Svg>
       <Line at={startAt - 2} x={tx} y={c.y(390)} size={24}>

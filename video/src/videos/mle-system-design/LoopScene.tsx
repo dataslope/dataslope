@@ -77,7 +77,7 @@ export const LoopScene: React.FC = () => {
         <QuestionCard n={8} at={qAt - 4} textAt={textAt - 4} size={Q_SIZE} width={Q_W}>
           What is label collection, and how do feedback loops work?
         </QuestionCard>
-        <MiniMap at={qAt} lit={[["labels", qAt + 10]]} />
+        <MiniMap at={qAt} store lit={[["labels", qAt + 10]]} />
 
         {/* ── The loop: a prediction, its outcome, logged, into training ── */}
         <Line at={launchAt} x={X0} y={mid - 16} size={24}>

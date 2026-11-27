@@ -49,7 +49,7 @@ const TWICE = 0;
  * Daily active users fail the same way: a week of days, one user on two of
  * them. Then the ratio, on Data Analyst Part 8's two days: the average of the
  * two rates is 26.0%, the sums divided 2.5%. So keep the numerator and the
- * denominator, which add, and strike the stored rate.
+ * denominator, which add, and mark the stored rate column as the one not to keep.
  */
 export const NonaddScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -137,8 +137,14 @@ export const NonaddScene: React.FC = () => {
         <QuestionCard n={7} at={qAt - 4} textAt={textAt - 4} size={62}>
           Why can&rsquo;t you simply sum pre-aggregated distinct counts or ratios?
         </QuestionCard>
-        <Note at={becauseAt} x={WEEK_X} y={gridTop - h(6)} out={phaseOut}>
+        {/* The answer heads both examples, over the grid where the first one
+            is drawn; the week gets its own heading when it comes (2026-11-26
+            review: it used to sit alone over the empty right half). */}
+        <Note at={becauseAt} x={X0} y={gridTop - h(100)} out={phaseOut}>
           <span style={{ ...label(26, INK), fontWeight: 600, whiteSpace: "nowrap" }}>Non-additive</span>
+        </Note>
+        <Note at={dauAt} x={WEEK_X} y={gridTop - h(6)} out={phaseOut}>
+          <span style={{ ...label(26, INK), fontWeight: 600, whiteSpace: "nowrap" }}>Daily active users</span>
         </Note>
 
         {/* ── Distinct products per order, summed ── */}
@@ -278,6 +284,9 @@ export const NonaddScene: React.FC = () => {
             { row: 1, col: 1, at: sumBothAt + 6, color: MARK_OK },
             { row: 0, col: 2, at: sumBothAt + 2, color: MARK_OK },
             { row: 1, col: 2, at: sumBothAt + 4, color: MARK_OK },
+            // "Not a rate column": the column it means (2026-11-26 review).
+            { row: 0, col: 3, at: storeAt + 10, color: MARK_BAD },
+            { row: 1, col: 3, at: storeAt + 12, color: MARK_BAD },
           ]}
         />
         <Listing lines={RATIO.averaged.sql} x={X0} top={avgTop} width={740} size={20} at={avgAt - 2} />

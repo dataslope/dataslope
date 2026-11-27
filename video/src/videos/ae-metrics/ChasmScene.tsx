@@ -75,6 +75,8 @@ export const ChasmScene: React.FC = () => {
   const benAt = n.word("chasm-left", "Ben paid forty dollars");
   const dropsAt = n.word("chasm-left", "an inner join drops him");
   const end = n.beat("chasm-left").to;
+  // After the inner join's drop, so the two notes are read in turn.
+  const coalesceAt = dropsAt + 12;
   // The six rows and their sums stay up two seconds, then clear.
   const phaseOut = fanOneAt + 2;
   const panelAt = fanOneAt + 8;
@@ -292,6 +294,13 @@ export const ChasmScene: React.FC = () => {
             <b>
               {ben[0]} kept, refunded <Num>{ben[2]}</Num>
             </b>
+          </span>
+        </Note>
+        {/* The 0.00 is COALESCE's (check.mjs, chasm.fix): a left join alone
+            leaves Ben's refund NULL (2026-11-26 review). */}
+        <Note at={coalesceAt} x={LEFT_X} y={lg.rowTop(left.rows.length) + h(56)}>
+          <span style={noteLine(21, INK_SOFT)}>
+            <Mono>COALESCE</Mono> turns his <Mono>NULL</Mono> into <Num>{ben[2]}</Num>
           </span>
         </Note>
       </Drift>

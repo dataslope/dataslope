@@ -77,19 +77,22 @@ export const SplitScene: React.FC = () => {
   const dotBase = y(690);
   const pitch = h(10);
   const counts = new Map<number, number>();
-  const dots = SPLIT.first.val.map((v, i) => {
+  // The repeat check.mjs picked as typical: its fifty scores centre on 50%.
+  const dots = SPLIT.shown.val.map((v, i) => {
     const k = Math.round(v / BIN);
     const c = counts.get(k) ?? 0;
     counts.set(k, c + 1);
-    return { x: at(HX, k * BIN), y: dotBase - h(8) - c * pitch, at: fiftyAt + i * 0.5, best: v === SPLIT.first.winnerVal };
+    return { x: at(HX, k * BIN), y: dotBase - h(8) - c * pitch, at: fiftyAt + i * 0.5, best: v === SPLIT.shown.winnerVal };
   });
   const best = dots.find((d) => d.best) ?? dots[0];
   const dotsOut = repeatsAt - 6;
 
   // ── Two hundred repeats: two histograms ──
+  // Low enough that the time arrow's "past" under the bar has a row of its
+  // own above the first histogram's label.
   const rows = [
-    { name: "The winner, on validation", vals: SPLIT.winnerVal, base: y(616), color: ACCENT, ink: ACCENT_INK, mean: SPLIT.meanWinnerVal, at: repeatsAt, meanAt: sixtyAt, prod: "Reported", prodAt: reportAt },
-    { name: "The same winner, on test", vals: SPLIT.winnerTest, base: y(836), color: BAR, ink: BLUE_INK, mean: SPLIT.meanWinnerTest, at: testFiftyAt - 6, meanAt: testFiftyAt, prod: "In production", prodAt: shipAt },
+    { name: "The winner, on validation", vals: SPLIT.winnerVal, base: y(640), color: ACCENT, ink: ACCENT_INK, mean: SPLIT.meanWinnerVal, at: repeatsAt, meanAt: sixtyAt, prod: "Reported", prodAt: reportAt },
+    { name: "The same winner, on test", vals: SPLIT.winnerTest, base: y(860), color: BAR, ink: BLUE_INK, mean: SPLIT.meanWinnerTest, at: testFiftyAt - 6, meanAt: testFiftyAt, prod: "In production", prodAt: shipAt },
   ];
   const unit = h(110) / 53;
   const binW = ((HX.b - HX.a) * BIN) / (HX.hi - HX.lo);
@@ -167,7 +170,7 @@ export const SplitScene: React.FC = () => {
           </Say>
           <Say at={bestAt + 4} x={best.x + 22} y={best.y - h(44)}>
             <span style={line(24, LIT_INK)}>
-              best: <span style={TABULAR}>{pct(SPLIT.first.winnerVal, 1)}</span>
+              best: <span style={TABULAR}>{pct(SPLIT.shown.winnerVal, 1)}</span>
             </span>
           </Say>
           <Say at={coinAt + 6} x={HX.b + 30} y={dotBase - 14}>

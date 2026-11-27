@@ -32,7 +32,8 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     on "between data engineering and analytics" the two outer boxes take
  *     the captions "Data engineering" and "Analytics", which stay through
  *     the probes (the review of 2026-11-20). "probe": the row slides up, and the page's four probes come in as a ruled list, one per
- *     beat, each with its topics as a line of words in the page's order,
+ *     beat, each with its topics as a line of words in the page's order
+ *     (the first capitalised, as a line on its own),
  *     the head words under the yellow highlighter as they are said: SQL and
  *     modeling (facts and dimensions, star schemas, grain, slowly changing
  *     dimensions); dbt (models, refs, sources, tests, materializations,
@@ -50,9 +51,10 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     then come in as a numbered list, one per beat ("ai-sql" to
  *     "ai-review"), each short ("Text-to-SQL or a semantic layer", "AI-ready
  *     modeling", "Evaluating an assistant", "Reviewing AI-written models"),
- *     the words the beat dwells on below each ("confident wrong answers";
- *     "docs, tests, access rules for a language model"; "verified answers, and ones to
- *     decline"; "grain, incremental logic, duplicate metrics"). "ai-ask":
+ *     the words the beat dwells on below each ("confident wrong answers from
+ *     raw tables"; "docs, tests, access rules for a language model";
+ *     "verified answers, and ones to decline"; "grain, incremental logic,
+ *     duplicate metrics"). "ai-ask":
  *     the line "Ask the recruiter, round by round" under the list.
  *     "ai-more": a bracket gathers the four and labels them "Part 9"
  *     (partOf("ae-ai-semantic-layer")).

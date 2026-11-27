@@ -163,8 +163,11 @@ const Argmax: React.FC<{ c: Ctx }> = ({ c }) => {
       {P.map((row, r) =>
         row.map((v, k) => {
           const rowMax = RAPID.argmax1[r] === k;
-          const colMax = RAPID.argmax0[k] === r;
-          const tone = colsOn > 0.5 && colMax ? "bad" : rowsOn > 0.5 && rowMax ? "ok" : "ink";
+          // The axis-0 picks are the same cells as three of the row answers
+          // here, so axis 0 never recolors a cell: turning them red marked
+          // three right answers wrong (review 2026-11-26). Its answers are
+          // the red ↓ under each column.
+          const tone = rowsOn > 0.5 && rowMax ? "ok" : "ink";
           return (
             <Cell key={`${r}${k}`} x={mx + k * pitch} y={top + r * rp} w={cw} h={rh} size={24} radius={5} tone={tone} opacity={ease(frame, decodeAt + r * 2, 10)}>
               {v.toFixed(1)}
@@ -211,6 +214,7 @@ const PRED = [1, 0, 0, 0, 1, 1];
 const Metrics: React.FC<{ c: Ctx }> = ({ c }) => {
   const frame = useCurrentFrame();
   const metricsAt = c.w("r-metrics", "Accuracy, precision and recall from scratch");
+  const precisionAt = c.w("r-metrics", "precision and recall from scratch");
   const masksAt = c.w("r-metrics", "are boolean masks, summed");
   const noLoopAt = c.w("r-metrics", "with no loop");
   const emptyAt = c.w("r-metrics", "Handle the empty case");
@@ -249,17 +253,24 @@ const Metrics: React.FC<{ c: Ctx }> = ({ c }) => {
       <Line at={masksAt + 4} x={cx + 6 * pitch + 24} y={top + rp / 2 + 8} size={23} color={INK_SOFT} out={noPosAt}>
         true positives: both 1
       </Line>
-      <div style={{ position: "absolute", left: R_X, top: c.y(512), display: "flex", flexDirection: "column", gap: c.h(14), fontSize: 24, opacity: ease(frame, masksAt + 8, 10) * (1 - 0.5 * ease(frame, emptyAt, 12)) }}>
-        <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
+      <div style={{ position: "absolute", left: R_X, top: c.y(512), display: "flex", flexDirection: "column", gap: c.h(14), fontSize: 24, opacity: 1 - 0.35 * ease(frame, emptyAt, 12) }}>
+        {/* All three, as the page writes them, each as it is named (review
+            2026-11-26: accuracy and the mask itself were missing). */}
+        <span style={{ ...note(24, INK), whiteSpace: "nowrap", opacity: ease(frame, metricsAt + 6, 10) }}>
+          accuracy <Mono>(y_pred == y_true).mean()</Mono>
+        </span>
+        <span style={{ ...note(24, INK), whiteSpace: "nowrap", opacity: ease(frame, precisionAt, 10) }}>
           precision <M>TP / (TP + FP)</M>, recall <M>TP / (TP + FN)</M>
         </span>
-        <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, noLoopAt, 10) }}>each count a mask, summed: no loop</span>
+        <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, noLoopAt, 10) }}>
+          each count a mask, summed, no loop: <Mono>TP = ((y_pred == 1) &amp; (y_true == 1)).sum()</Mono>
+        </span>
       </div>
-      <Line at={noPosAt + 8} x={R_X} y={c.y(640)} size={24}>
+      <Line at={noPosAt + 8} x={R_X} y={c.y(690)} size={24}>
         Predicts no positives: precision <M>0 / 0</M>
         <Fade at={zeroAt}> </Fade>
       </Line>
-      <div style={{ position: "absolute", left: R_X, top: c.y(640) + c.h(54), display: "flex", gap: 48, fontSize: 24, whiteSpace: "nowrap" }}>
+      <div style={{ position: "absolute", left: R_X, top: c.y(690) + c.h(54), display: "flex", gap: 48, fontSize: 24, whiteSpace: "nowrap" }}>
         <span style={{ ...note(24, ACCENT_INK), fontWeight: 600, opacity: ease(frame, numpyAt, 10) }}>NumPy: {RAPID.precisionNumpy}</span>
         <span style={{ ...note(24, INK), fontWeight: 600, opacity: ease(frame, sklearnAt, 10) }}>scikit-learn: {RAPID.precisionSklearn}, with a warning</span>
       </div>
@@ -335,6 +346,12 @@ const Knn: React.FC<{ c: Ctx }> = ({ c }) => {
           </span>
         ))}
       </div>
+      {/* Which index for which data: the trees pay off in a few dimensions
+          and fade toward brute force as they grow; these rows have 64
+          (review 2026-11-26). */}
+      <div style={{ position: "absolute", left: R_X, top: c.y(636) + c.h(106) + 64, ...note(21, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, idx[1].at + 4, 10) }}>trees: low dimensions</div>
+      {/* Starts under the HNSW badge (KD-tree and ball tree are 268 px wide with their gaps). */}
+      <div style={{ position: "absolute", left: R_X + 268, top: c.y(636) + c.h(106) + 64, ...note(21, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, idx[2].at + 4, 10) }}>approximate: embeddings</div>
     </>
   );
 };

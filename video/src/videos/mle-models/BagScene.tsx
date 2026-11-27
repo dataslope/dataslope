@@ -40,7 +40,8 @@ export const BagScene: React.FC = () => {
   const corrdAt = n.word("bag-floor", "how correlated their errors are");
   const end = n.beat("bag-floor").to;
 
-  const top = y(330);
+  // The diagrams sit under a one-line answer to "What are ensembles?".
+  const top = y(372);
   // Bagging: three models side by side, into an average.
   const bw = 200;
   const bh = h(70);
@@ -75,7 +76,12 @@ export const BagScene: React.FC = () => {
           What are ensembles? Explain bagging and boosting.
         </QuestionCard>
 
-        <Fade at={bagAt - 6} out={out}>
+        <Fade at={textAt + 20} out={out}>
+          {/* ── What an ensemble is: the page's "combine multiple models" ── */}
+          <Line at={textAt + 26} x={X0} y={y(296)} size={28}>
+            Ensembles combine many models into one prediction
+          </Line>
+
           {/* ── Bagging ── */}
           <Line at={bagAt - 2} x={X0} y={top} size={30}>
             Bagging
@@ -157,7 +163,7 @@ export const BagScene: React.FC = () => {
               </React.Fragment>
             );
           })}
-          <Line at={corrdAt - 2} x={chart.left + 360} y={at(F.y, 0.82)} size={24}>
+          <Line at={corrdAt - 2} x={chart.left + 360} y={at(F.y, 0.875)} size={24}>
             Floors set by <Mark at={corrdAt + 4}>how correlated the errors are</Mark>
           </Line>
           <Line at={floorAt + 20} x={chart.left + chart.width + 18} y={chart.top + chart.height - h(30)} size={21} color={INK_SOFT}>

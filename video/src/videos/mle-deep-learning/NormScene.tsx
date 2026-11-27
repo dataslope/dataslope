@@ -87,7 +87,7 @@ export const NormScene: React.FC = () => {
             <I>γ</I> (<I>x</I> − <I>μ</I>) / <I>σ</I> + <I>β</I>
           </MathRun>
         </Line>
-        <Line at={acrossAt} x={BN_X} y={y(368)} size={22} color={INK_SOFT}>
+        <Line at={acrossAt} x={BN_X} y={y(368)} size={20} color={INK_SOFT}>
           <MathRun>
             <I>μ</I>, <I>σ</I>
           </MathRun>{" "}
@@ -202,6 +202,11 @@ export const NormScene: React.FC = () => {
         </Line>
         <Line at={leftAt} x={120 + PITCH + 30} y={rows[2].top + h(76)} size={24} color={ACCENT_INK}>
           Left in training mode: <Mark at={ignoresAt}>it ignores its input</Mark>
+        </Line>
+        {/* The batch-of-one result is per feature: a convolution's batch norm
+            also averages each channel over the image's own pixels. */}
+        <Line at={ignoresAt + 14} x={120 + PITCH + 30} y={rows[2].top + h(120)} size={22} color={INK_SOFT}>
+          One value per feature here, as after a dense layer
         </Line>
         <Line at={freeAt} x={LN_X} y={rows[2].top + D + h(26)} size={22} color={OK_INK}>
           Free of batch size

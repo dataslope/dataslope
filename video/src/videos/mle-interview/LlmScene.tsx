@@ -49,20 +49,41 @@ const StillRow: React.FC<{ top: number; name: string; at: number; out: number; p
   );
 };
 
-/** One addition: its numeral in a tinted disc, its name lit yellow while it
- *  is read, the parts that answer it at the right end, and its topics under
- *  the name, word by word. */
-const Item: React.FC<{ i: number; top: number; name: string; at: number; litOut: number; topics: Topic[]; parts: readonly number[] }> = ({
-  i,
-  top,
-  name,
-  at,
-  litOut,
-  topics,
-  parts,
-}) => (
+/** A line of topics led by a phrase that introduces them ("a smaller model
+ *  or a rule does better: ..."): the lead inks on its own cue, then each
+ *  topic as it is said, joined by commas as Topics joins them. */
+const Led: React.FC<{ lead: Topic; items: readonly Topic[]; size?: number }> = ({ lead, items, size = 24 }) => {
+  const frame = useCurrentFrame();
+  return (
+    <div style={{ ...note(size, INK), fontWeight: 400, whiteSpace: "nowrap" }}>
+      <span style={{ opacity: ease(frame, lead.at - 2, 10) }}>{lead.text} </span>
+      {items.map((t, k) => (
+        <span key={t.text} style={{ opacity: ease(frame, t.at - 2, 10) }}>
+          {k ? <span style={{ color: INK_SOFT }}>, </span> : null}
+          {t.text}
+        </span>
+      ))}
+    </div>
+  );
+};
+
+/** One addition: its numeral in a tinted disc and its name, inked on `inAt`
+ *  (all four arrive together, on "four things"); the name lit yellow while
+ *  it is read, the parts that answer it at the right end as it is, and its
+ *  topics under the name, word by word. */
+const Item: React.FC<{
+  i: number;
+  top: number;
+  name: string;
+  inAt: number;
+  at: number;
+  litOut: number;
+  topics: Topic[];
+  lead?: Topic;
+  parts: readonly number[];
+}> = ({ i, top, name, inAt, at, litOut, topics, lead, parts }) => (
   <>
-    <Settle at={at} top={top} width={RIGHT_X - LEFT_X}>
+    <Settle at={inAt} top={top} width={RIGHT_X - LEFT_X}>
       <div style={{ display: "flex", alignItems: "center" }}>
         <Badge tone="gray" size={NAME_SIZE} style={{ width: 44, height: 44, padding: 0, display: "inline-flex", alignItems: "center", justifyContent: "center", borderRadius: "50%", fontFamily: SANS, fontWeight: 600 }}>
           {i + 1}
@@ -76,8 +97,8 @@ const Item: React.FC<{ i: number; top: number; name: string; at: number; litOut:
       </div>
     </Settle>
     {topics.length ? (
-      <Settle at={topics[0].at} top={top + TOPICS_DY} left={TEXT_X}>
-        <Topics items={topics} />
+      <Settle at={lead?.at ?? topics[0].at} top={top + TOPICS_DY} left={TEXT_X}>
+        {lead ? <Led lead={lead} items={topics} /> : <Topics items={topics} />}
       </Settle>
     ) : null}
   </>
@@ -123,18 +144,35 @@ export const LlmScene: React.FC = () => {
       { text: "guardrails and fallbacks", at: n.word("llm-design", "guardrails and fallbacks") },
       { text: "drawn as a system with latency and cost budgets", at: n.word("llm-design", "drawn as a system") },
     ],
+    // The index's own wording of this item, which names what the LLM
+    // page's "which lever buys what" leaves to the follow-up: where the
+    // memory goes, and the three levers.
     [
       { text: "why generation is slow", at: n.word("llm-econ", "why generation is slow") },
-      { text: "where the GPU memory goes", at: n.word("llm-econ", "where the GPU memory goes") },
-      { text: "which lever buys what", at: n.word("llm-econ", "which lever buys what") },
+      { text: "where GPU memory goes (the KV cache)", at: n.word("llm-econ", "where the GPU memory goes") },
+      { text: "what batching, quantization and speculative decoding buy", at: n.word("llm-econ", "which lever buys what") },
     ],
     [
       { text: "building a test set", at: n.word("llm-eval", "building a test set") },
       { text: "trusting or distrusting an automated judge", at: n.word("llm-eval", "trusting or distrusting") },
       { text: "tying offline scores to online outcomes", at: n.word("llm-eval", "tying offline scores") },
     ],
-    [],
+    // The cases from the LLM page's "When should you not use an LLM?".
+    [
+      { text: "tabular prediction", at: n.word("llm-not-when", "tabular prediction") },
+      { text: "a strict latency or cost budget", at: n.word("llm-not-when", "a strict latency or cost budget") },
+      { text: "a task a regular expression solves", at: n.word("llm-not-when", "a task a regular expression solves") },
+    ],
   ];
+  const leads: (Topic | undefined)[] = [
+    undefined,
+    undefined,
+    undefined,
+    { text: "a smaller model or a rule does better:", at: n.word("llm-not-when", "Often a smaller model or a rule") },
+  ];
+  // The four names take the slots the still-asked rows leave, on "four
+  // things", so the page is not bare while they are announced.
+  const fourAt = n.word("llm", "four things");
   const someAt = n.word("llm-ask", "Some companies also run coding rounds");
   const askAt = n.word("llm-ask", "ask the recruiter");
   const end = n.beat("llm-ask").to;
@@ -148,6 +186,7 @@ export const LlmScene: React.FC = () => {
         <Sfx key={at} name="el-tap" at={at} level={-32} />
       ))}
       <Sfx name="el-whoosh" at={stillOut} level={-37} />
+      <Sfx name="el-tap" at={fourAt} level={-34} />
       {nameAt.map((at) => (
         <Sfx key={at} name="el-tap" at={at} level={-30} />
       ))}
@@ -167,7 +206,18 @@ export const LlmScene: React.FC = () => {
         ))}
 
         {ADDED.map((a, i) => (
-          <Item key={a.name} i={i} top={y(LIST_Y) + i * h(ROW_STEP)} name={a.name} at={nameAt[i]} litOut={litOut[i]} topics={topics[i]} parts={a.parts} />
+          <Item
+            key={a.name}
+            i={i}
+            top={y(LIST_Y) + i * h(ROW_STEP)}
+            name={a.name}
+            inAt={fourAt + i * 4}
+            at={nameAt[i]}
+            litOut={litOut[i]}
+            topics={topics[i]}
+            lead={leads[i]}
+            parts={a.parts}
+          />
         ))}
 
         <Settle at={someAt} top={y(ASK_Y)}>

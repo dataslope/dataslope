@@ -93,7 +93,8 @@ export const REG = results.reg as {
 /** Question five: the page's split (train, validation, test sizes), and the
  *  selection simulation: coin-flip labels, the best of 50 settings on
  *  validation, scored once on test, 200 repeats. `first` is repeat 0's fifty
- *  validation scores. */
+ *  validation scores; `shown` is the repeat drawn on screen, the one whose
+ *  fifty scores average closest to 50% with a winner closest to the mean. */
 export const SPLIT = results.split as {
   sizes: [number, number, number];
   settings: number;
@@ -103,6 +104,7 @@ export const SPLIT = results.split as {
   meanWinnerVal: number;
   meanWinnerTest: number;
   first: { val: number[]; winnerVal: number; winnerTest: number };
+  shown: { repeat: number; val: number[]; mean: number; winnerVal: number; winnerTest: number };
 };
 
 /** Question seven: the page's five folds (and its printed line), and sixty

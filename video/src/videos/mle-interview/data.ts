@@ -130,13 +130,15 @@ export const ROUNDS = ["Coding", "ML concepts", "ML system design"] as const;
 
 /** The index's four probes ("rounds-probe", "rounds-ops"), their topics as
  *  the page lists them, and the parts that answer them (monitoring and drift
- *  are Part 8's, the rest of system design Part 7's); then the track's other
- *  pages ("rounds-more"). */
+ *  are Part 8's, the rest of system design Part 7's; MLOps' latency and cost
+ *  are Part 7's serving questions, which also answers 3 of the mlops page's
+ *  questions, and the rest Part 8's); then the track's other pages
+ *  ("rounds-more"). */
 export const PROBES: readonly { name: string; topics: string; parts: number[] }[] = [
   { name: "ML fundamentals", topics: "supervised vs unsupervised, over/underfitting, regularization, metrics, leakage", parts: [1, 2] },
   { name: "Coding", topics: "data structures and algorithms, NumPy, pandas", parts: [3] },
   { name: "ML system design", topics: "training and serving pipelines, feature stores, batch vs online inference, monitoring and drift", parts: [7, 8] },
-  { name: "MLOps", topics: "reproducibility, versioning data and models, CI/CD, latency and cost", parts: [8] },
+  { name: "MLOps", topics: "reproducibility, versioning data and models, CI/CD, latency and cost", parts: [7, 8] },
 ];
 export const ALSO_ON_TRACK = { name: "Also on the track", topics: "statistics, deep learning, NLP and LLMs", parts: [4, 5, 6] } as const;
 

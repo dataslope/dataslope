@@ -36,7 +36,10 @@ const PICTURE = (() => {
     }
     return p;
   };
-  return { rows, together: perm(7), apart: perm(23) };
+  // apart: a seed whose order moves every label off its own row (seed 23
+  // left two in place, under a caption that says every row; review
+  // 2026-11-26).
+  return { rows, together: perm(7), apart: perm(10) };
 })();
 
 /**

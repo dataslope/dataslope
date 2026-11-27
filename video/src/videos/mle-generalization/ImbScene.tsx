@@ -8,7 +8,7 @@ import { ds } from "../../theme/brand";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { FRAUD } from "./data";
-import { Drift, Fade, line, MARK_BAD, OK, OK_INK, pct, Q_SIZE, RuledList, Say, X0 } from "./parts";
+import { Drift, Fade, line, LIT_INK, MARK_BAD, OK, OK_INK, pct, Q_SIZE, RuledList, Say, X0 } from "./parts";
 
 const CELL = 34;
 const PITCH = 40;
@@ -17,9 +17,10 @@ const PITCH = 40;
  * Question 10 on the same fraud model. A hundred transactions, one of them
  * fraud, and the model that calls them all legitimate: 99% accurate, nothing
  * caught. The remedies, read as a list. Then what balanced class weights do
- * to it: recall at 0.5 up from 24% to 84%, but the average predicted
- * probability up from 1% to 22% when the true rate is 1%, and PR-AUC down;
- * and the three things to do about it.
+ * to it: recall at 0.5 up from 24% to 84%, at the usual price, precision
+ * down from 84% to 5%; but also the average predicted probability up from 1%
+ * to 22% when the true rate is 1%, and PR-AUC down; and the three things to
+ * do about it.
  */
 export const ImbScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -45,11 +46,13 @@ export const ImbScene: React.FC = () => {
   const balancedAt = n.word("imb-trap", "With balanced class weights");
   const recallAt = n.word("imb-trap", "recall at point five jumps");
   const eightyAt = n.word("imb-trap", "to eighty-four");
-  const avgAt = n.word("imb-trap", "the average transaction");
-  const twentyAt = n.word("imb-trap", "twenty-two percent likely");
-  const onePctAt = n.word("imb-trap", "when one percent is");
-  const prAt = n.word("imb-trap", "its pee-ar ay-you-see falls");
-  const threeTwoAt = n.word("imb-trap", "point three two");
+  const precisionAt = n.word("imb-trade", "precision falls");
+  const fiveAt = n.word("imb-trade", "to five");
+  const avgAt = n.word("imb-cost", "the average transaction");
+  const twentyAt = n.word("imb-cost", "twenty-two percent likely");
+  const onePctAt = n.word("imb-cost", "when one percent is");
+  const prAt = n.word("imb-cost", "its pee-ar ay-you-see falls");
+  const threeTwoAt = n.word("imb-cost", "point three two");
   const recalAt = n.word("imb-prod", "recalibrate");
   const rankingAt = n.word("imb-prod", "won't win back the ranking");
   const lowerAt = n.word("imb-prod", "try lowering");
@@ -65,11 +68,15 @@ export const ImbScene: React.FC = () => {
   const gridOut = trapAt - 6;
 
   // ── The table ──
-  const T = { x: X0, top: y(330), w: 1420 };
+  // Four rows and the three steps under them fit above the page's foot.
+  const T = { x: X0, top: y(310), w: 1420 };
   const COL = [X0 + 20, 860, 1150];
-  const rowH = h(96);
+  const rowH = h(76);
   const rows = [
-    { name: "Recall at threshold 0.5", plain: pct(FRAUD.thresholds[0].recall), bal: pct(FRAUD.weighted.at.recall), at: recallAt, balAt: eightyAt, mark: HIGHLIGHT, ink: INK, note: "" },
+    // A tinted mark's text takes its hue's ink, never black.
+    { name: "Recall at threshold 0.5", plain: pct(FRAUD.thresholds[0].recall), bal: pct(FRAUD.weighted.at.recall), at: recallAt, balAt: eightyAt, mark: HIGHLIGHT, ink: LIT_INK, note: "" },
+    // What the recall cost: flagging fifteen thousand, not three hundred.
+    { name: "Precision at threshold 0.5", plain: pct(FRAUD.thresholds[0].precision), bal: pct(FRAUD.weighted.at.precision), at: precisionAt, balAt: fiveAt, mark: MARK_BAD, ink: ACCENT_INK, note: "" },
     {
       name: "Average predicted probability",
       plain: pct(FRAUD.weighted.plainMeanProbability),
@@ -162,7 +169,7 @@ export const ImbScene: React.FC = () => {
           <div style={{ position: "absolute", inset: 0, opacity: tableIn }}>
             <div style={{ position: "absolute", left: T.x, top: T.top, width: T.w * tableIn, height: 2, background: INK }} />
             <div style={{ position: "absolute", left: T.x, top: T.top + h(60), width: T.w * tableIn, height: 1, background: HAIRLINE }} />
-            <div style={{ position: "absolute", left: T.x, top: T.top + h(60) + 3 * rowH, width: T.w * tableIn, height: 1.5, background: INK }} />
+            <div style={{ position: "absolute", left: T.x, top: T.top + h(60) + rows.length * rowH, width: T.w * tableIn, height: 1.5, background: INK }} />
           </div>
         ) : null}
         <Say at={trapAt} x={COL[1]} y={T.top + h(14)}>
@@ -177,7 +184,7 @@ export const ImbScene: React.FC = () => {
           return (
             <React.Fragment key={r.name}>
               {i > 0 ? <div style={{ position: "absolute", left: T.x, top, width: T.w, height: 1, background: `color-mix(in srgb, ${INK} 16%, transparent)`, opacity: ease(frame, r.at - 4, 10) }} /> : null}
-              <div style={{ position: "absolute", left: COL[2] - 14, top: top + h(20), width: 124 * mark, height: rowH - h(40), background: r.mark, borderRadius: 4 }} />
+              <div style={{ position: "absolute", left: COL[2] - 14, top: top + h(15), width: 124 * mark, height: rowH - h(30), background: r.mark, borderRadius: 4 }} />
               <Say at={r.at - 4} x={COL[0]} y={top + rowH / 2 - 21}>
                 <span style={line(32, INK)}>{r.name}</span>
               </Say>
@@ -198,7 +205,7 @@ export const ImbScene: React.FC = () => {
 
         {/* ── What to do ── */}
         {steps.map((s, i) => (
-          <Say key={s.text} at={(s.lead ?? s.at) - 2} x={X0} y={y(720) + i * h(66)}>
+          <Say key={s.text} at={(s.lead ?? s.at) - 2} x={X0} y={T.top + h(60) + rows.length * rowH + h(42) + i * h(62)}>
             <span style={{ display: "inline-flex", alignItems: "center", gap: 16, fontSize: 28 }}>
               <Tick at={s.at} size={26} color={OK} />
               <span style={line(28, OK_INK)}>{s.text}</span>

@@ -83,8 +83,10 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     does not hold, and its answer "No metric matches" in green (the
  *     refusal is the right behavior), beside a small easel spot labelled
  *     "Board deck" with a red question mark (ae-ai-semantic-layer-easel).
- *     "sem-active": that request named, active_users, last week, and the
- *     right reply as three lines (Not defined; Closest governed metrics; An
+ *     "sem-active": that request named, active_users in the metric slot,
+ *     "last week" in filters and "week" as the time grain (review
+ *     2026-11-26: "last week" drawn as the grain confused a range with a
+ *     granularity), and the right reply as three lines (Not defined; Closest governed metrics; An
  *     exploratory query, labeled unverified). "sem-drift": "Let the LLM
  *     define it" struck through in red, "metric drift by design" beside it.
  *     "sem-trade": a fork: "Modeled: through the layer" (green) and
@@ -110,9 +112,13 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     until the review: the second sentence was re-voiced, the first is cut
  *     from the take): back on the YAML, "and test
  *     accounts" struck through on "Drop the words and test accounts" (here the
- *     strike is the edit being made, not a verdict on the words), and under
- *     it 440.00 turns into 1190.00 in red (READY.asWritten,
- *     READY.withoutCut).
+ *     strike is the edit being made, not a verdict on the words). The arrow
+ *     from the description to "Net revenue, in SQL written from the
+ *     description" and its green 440.00 (READY.asWritten) come in on
+ *     "documentation is now an input", before the strike; the strike
+ *     retires 440.00 to "As written, 440.00", and 1190.00 (READY.withoutCut)
+ *     arrives in red on its words (review 2026-11-26: a green 440.00 beside
+ *     the struck line read as "the cut changes nothing").
  *     "ready-review": "Review descriptions like code" under the listing.
  *   - "eval" to "eval-regress": the question card. "eval": the golden set
  *     as a small two-column table, question and verified result, and the
@@ -381,7 +387,9 @@ export const script: NarrationScript = {
     {
       id: "ready-tests",
       text: "Test what the descriptions claim: the key unique and not null, relationships for foreign keys, and accepted values, so the assistant knows the real statuses are completed, refunded and cancelled.",
-      pauseAfter: 0.6,
+      // The real statuses hold about 2 s before access replaces them
+      // (review 2026-11-26: under a second at 0.6).
+      pauseAfter: 1.3,
     },
     {
       id: "ready-access",

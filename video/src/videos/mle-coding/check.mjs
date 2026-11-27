@@ -13,7 +13,7 @@
 //
 // Timings are the one thing a rerun does not reproduce: they vary from run
 // to run and machine to machine, so the narration argues from ratios only
-// ("roughly a hundred times", "roughly thirty times", "more than ten
+// ("roughly a hundred times", "roughly forty times", "more than ten
 // times"), and this
 // script fails if a run stops fitting those words. Each timing is the best of
 // several runs after a warm-up.
@@ -358,11 +358,11 @@ for (const q of quotes) if (!flat(page).includes(flat(q))) problems.push(`coding
 const within = (v, lo, hi, what) => {
   if (!(v >= lo && v <= hi)) problems.push(`${what} is ${v}, outside ${lo} to ${hi}`);
 };
-// Timings: "roughly a hundred times", "roughly thirty times", "more than
+// Timings: "roughly a hundred times", "roughly forty times", "more than
 // ten times". On this machine, best of 15 runs, they come out about 85 to
 // 120, 29 to 38 and 13 to 16.
 within(R.vector.ratio.loop, 50, 200, "loop / matrix product (said: roughly a hundred times)");
-within(R.vector.ratio.perRow, 15, 60, "per-row NumPy / matrix product (said: roughly thirty times)");
+within(R.vector.ratio.perRow, 30, 55, "per-row NumPy / matrix product (said: roughly forty times)");
 within(R.topk.ratio, 10, 40, "sort / argpartition on a million (said: more than ten times)");
 if (!(R.rapid.knn.ms.distances > R.rapid.knn.ms.sort)) problems.push("the distances no longer cost more than the full sort");
 if (R.vector.maxDiff > 1e-9) problems.push("the loop and the matrix product disagree");
@@ -409,7 +409,7 @@ const decimal = (v, places) => {
 const claims = [
   ["q1-time", "a hundred thousand items"],
   ["q1-time", "roughly a hundred times slower"],
-  ["q1-row", "roughly thirty times slower"],
+  ["q1-row-ratio", "roughly forty times slower"],
   ["q2-zero", "top three puts the empty item first"],
   ["q3-time", "more than ten times faster"],
   ["q4-trap", decimal(R.broadcast.mseWrong, 1)],

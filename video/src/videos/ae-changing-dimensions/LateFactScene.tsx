@@ -297,8 +297,10 @@ export const LateFactScene: React.FC = () => {
             {m}
           </Box>
         ))}
+        {/* Named by its order date: elsewhere "lands" is the video's word for
+            arriving, and this order arrives today (review 2026-11-26). */}
         <Note at={landsAt + 4} x={X0 + mayIdx * (cellW + cellGap)} y={low + h(40) + cellH + h(16)}>
-          <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>Rebuilt: the order lands in May</span>
+          <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>Rebuilt: May, the month of its order date</span>
         </Note>
         <Note at={accAt} x={X0} y={accTop}>
           <span style={{ ...label(22, INK), whiteSpace: "nowrap" }}>Accumulating snapshot, one row an order</span>

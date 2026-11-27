@@ -171,8 +171,16 @@ export const CosineScene: React.FC = () => {
         <div style={{ position: "absolute", right: 1920 - (OX - 22), top: oy + 10, textAlign: "right", opacity: ease(frame, newAt, 12), whiteSpace: "nowrap", ...note(23, INK), fontWeight: 500 }}>
           new item<Fade at={zerosAt}>: all zeros</Fade>
         </div>
+        {/* The new item's score: 0 / 0 is nan; with the guard the
+            denominator is 0 + 10^-12, never 0 / 0 (review 2026-11-26). */}
         <div style={{ position: "absolute", right: 1920 - (OX - 22), top: oy + 10 + h(36), textAlign: "right", whiteSpace: "nowrap", fontSize: 23, opacity: ease(frame, zeroOverAt, 10) }}>
-          <span style={{ ...note(23, INK_SOFT) }}>0 / 0 = </span>
+          {fixed ? (
+            <span style={{ ...note(23, INK_SOFT) }}>
+              0 / (0 <span style={{ color: OK_INK }}>+ <M>{"10^{-12}"}</M></span>) ={" "}
+            </span>
+          ) : (
+            <span style={{ ...note(23, INK_SOFT) }}>0 / 0 = </span>
+          )}
           <span style={{ ...note(23, fixed ? OK_INK : ACCENT_INK), fontWeight: 600, opacity: ease(frame, nanAt, 8) }}>{fixed ? "0" : "nan"}</span>
         </div>
 
@@ -218,7 +226,7 @@ export const CosineScene: React.FC = () => {
             </div>
           );
         })}
-        <Line at={everyAt} x={X0 + 340} y={rowY(0)} size={24} color={ACCENT_INK} dim={zeroAt + 4}>
+        <Line at={everyAt} x={X0 + 340} y={rowY(0)} size={24} color={ACCENT_INK} out={zeroAt}>
           for every single user
         </Line>
         <Line at={zeroAt + 6} x={X0 + 340} y={rowY(1)} size={24} color={OK_INK} weight={600}>

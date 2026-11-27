@@ -317,6 +317,20 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     reviewed pages moved the measured tokenization and retrieval numbers
  *     (the figures above are the new ones; the two top answers swapped
  *     places); every number said aloud still holds.
+ *   - Added by the 2026-11-26 review, each where an answer stopped before the
+ *     follow-up: "q1-bpe" (the page's "byte-pair encoding (BPE), WordPiece,
+ *     the unigram model"; how BPE builds its pieces, from single bytes for
+ *     o200k_base, is standard and not the page's), "q7-grad" (the page's
+ *     "gradients vanish over many steps"; "q7-a" was split at its sentence
+ *     break and its second sentence is now "q7-tf"), and "r-random-host"
+ *     (the page's #746 paragraph on hosted reasoning models refusing the
+ *     sampler settings, the one follow-up the build missed). On screen only:
+ *     skip-gram and CBOW (the page's "skip-gram ... (or CBOW does the
+ *     reverse)") and the other parameter-efficient methods ("Adapters and
+ *     prefix tuning are similar ideas"). Question 8's chart now draws the
+ *     whole context's multiply-adds per layer (results.json cost.totals),
+ *     attention 2 n^2 d against the rest 12 n d^2, so "the rest of a layer
+ *     only grows linearly" is the straight line it says.
  *
  * Written for Drew's ear: initialisms in plain caps (NLP, LLM, RNN, GPU,
  * GPT, RLHF, RAG, BLEU, ROUGE, F1, ML), each expanded the first time a
@@ -359,6 +373,11 @@ export const script: NarrationScript = {
     {
       id: "q1-piece",
       text: "A production tokenizer with two hundred thousand pieces splits the word hallucination in two, and averages one point four tokens a word on this page.",
+      pauseAfter: 0.6,
+    },
+    {
+      id: "q1-bpe",
+      text: "Those pieces come from byte-pair encoding: start from single bytes, and keep merging the most frequent adjacent pair until the vocabulary is full.",
       pauseAfter: 0.6,
     },
     {
@@ -438,9 +457,11 @@ export const script: NarrationScript = {
       pauseAfter: 0.7,
     },
     { id: "q7", scene: true, text: "Question seven. Why did transformers replace RNNs for most NLP?" },
+    { id: "q7-a", text: "An RNN squeezes everything through one hidden state, one step at a time: slow to train, and forgetful over distance." },
+    { id: "q7-grad", text: "Its gradients shrink with every step back, so distant words barely count." },
     {
-      id: "q7-a",
-      text: "An RNN squeezes everything through one hidden state, one step at a time: slow to train, and forgetful over distance. A transformer links any two tokens directly and, in training, processes every position at once, which is what a GPU is built for.",
+      id: "q7-tf",
+      text: "A transformer links any two tokens directly and, in training, processes every position at once, which is what a GPU is built for.",
       pauseAfter: 0.7,
     },
     { id: "cost-in", text: "The trade-off is attention's own cost." },
@@ -554,6 +575,10 @@ export const script: NarrationScript = {
     {
       id: "r-random",
       text: "Randomness: temperature divides the scores before the softmax, so near zero is almost greedy, and higher is more varied. Top-k keeps the k likeliest tokens; top-p, the smallest set whose probabilities add up past p. Keep it low for extraction, higher for brainstorming.",
+    },
+    {
+      id: "r-random-host",
+      text: "A hosted reasoning model may refuse these settings; there, you steer with the prompt, a reasoning-effort setting and structured outputs.",
       pauseAfter: 0.6,
     },
     {

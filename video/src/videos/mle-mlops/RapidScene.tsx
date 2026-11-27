@@ -143,19 +143,31 @@ const BlueGreen: React.FC<{ c: Ctx }> = ({ c }) => {
   const blueY = c.y(350);
   const greenY = c.y(500);
   const tr = { x: R_X, w: 170, y: c.y(425) };
-  const toGreen = ease(frame, flipAt, 8) * (1 - ease(frame, backAt + 6, 8));
+  // Traffic flips to green and stays there: the deploy is the outcome. The
+  // way back is drawn as a path ready to take ("if anything breaks"), not
+  // taken, so the figure does not end rolled back.
+  const toGreen = ease(frame, flipAt, 8);
   const live = toGreen > 0.5 ? greenY : blueY;
   const trMid = tr.y + env.h / 2;
+  // The switch turns down to green clear of the note under Traffic; the
+  // way back turns up to blue before it.
+  const SWITCH_X = 1100;
+  const BACK_X = 1040;
   return (
     <>
       <Box x={tr.x} y={tr.y} w={tr.w} h={env.h} at={twoAt - 4} title="Traffic" size={24} />
       <Box x={env.x} y={blueY} w={env.w} h={env.h} at={twoAt} title="Blue (current)" sub={<span style={{ opacity: ease(frame, servesAt, 10) }}>{toGreen > 0.5 ? "standing by" : "serving"}</span>} size={24} lit={toGreen > 0.5 ? undefined : servesAt} litOut={flipAt} />
-      <Box x={env.x} y={greenY} w={env.w} h={env.h} at={twoAt + 6} title="Green (new)" sub={<span style={{ opacity: ease(frame, warmAt - 4, 10) }}>{toGreen > 0.5 ? "serving" : frame >= backAt + 6 ? "new model" : "new model, warming up"}</span>} size={24} lit={flipAt} litOut={backAt + 6} />
-      {/* The one switch, redrawn on each flip. */}
-      <Flow key={live} points={[[tr.x + tr.w + 4, trMid], [1000, trMid], [1000, live + env.h / 2], [env.x - 3, live + env.h / 2]]} at={live === blueY ? (frame < flipAt ? servesAt : backAt + 6) : flipAt} dur={8} color={BAR} width={5} head={16} radius={14} />
+      <Box x={env.x} y={greenY} w={env.w} h={env.h} at={twoAt + 6} title="Green (new)" sub={<span style={{ opacity: ease(frame, warmAt - 4, 10) }}>{toGreen > 0.5 ? "serving" : "new model, warming up"}</span>} size={24} lit={flipAt} litOut={downAt} />
+      {/* The one switch, redrawn when it flips. */}
+      <Flow key={live} points={[[tr.x + tr.w + 4, trMid], [SWITCH_X, trMid], [SWITCH_X, live + env.h / 2], [env.x - 3, live + env.h / 2]]} at={live === blueY ? servesAt : flipAt} dur={8} color={BAR} width={5} head={16} radius={14} />
+      {/* The way back to blue, ready if anything breaks. */}
+      <Flow points={[[tr.x + tr.w + 4, trMid - 18], [BACK_X, trMid - 18], [BACK_X, blueY + env.h / 2], [env.x - 3, blueY + env.h / 2]]} at={backAt} dur={14} color={BAR} width={3} head={13} radius={12} dash="9 7" />
       <Line at={flipAt + 4} x={tr.x} y={tr.y + env.h + c.h(20)} size={21} color={INK_SOFT}>
         One switch
         <span style={{ opacity: ease(frame, backAt, 10) }}>, and back</span>
+      </Line>
+      <Line at={backAt + 4} x={tr.x} y={tr.y + env.h + c.h(20) + 30} size={21} color={INK_SOFT}>
+        if anything breaks
       </Line>
       <Line at={downAt - 2} x={R_X} y={c.y(660)} size={24} color={OK_INK}>
         Near-zero downtime

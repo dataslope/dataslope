@@ -22,6 +22,8 @@
     "freeGB": 500,
     "per8kBytes": 2684354560,
     "per8kGiB": 2.5,
+    "per8kGB": 2.68,
+    "per8kNoGqaGiB": 20,
     "fit8k": 186,
     "fit128k": 11,
     "fitNoGqa8k": 23
@@ -47,7 +49,9 @@
     "emptyShare": 0.7559,
     "blockTokens": 16,
     "worstWasteTokens": 15,
-    "worstWasteShare": 0.0075
+    "worstWasteShare": 0.0075,
+    "blocksUsed": 125,
+    "lastBlockTokens": 16
   },
   "batching": {
     "seed": 7,

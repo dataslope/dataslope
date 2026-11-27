@@ -24,7 +24,7 @@ type Figure = { setup: string; version: string; steps: Record<string, Step> };
 type Selection = { selector: string; models: string[]; sources: string[]; exposures: string[] };
 
 const R = results as unknown as {
-  dbtV2: { language: string; engineName: string; generallyAvailable: string; coreLine: string; coreEndsAt: string; testsKey: string };
+  dbtV2: { language: string; engineName: string; generallyAvailable: string; coreLine: string; coreEndsAt: string; ossLicense: string; testsKey: string };
   graph: {
     sources: string[];
     models: string[];

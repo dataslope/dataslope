@@ -13,15 +13,18 @@ import { COST } from "./data";
 import { ACCENT_INK, BAR, BLUE_INK, Clear, commas, DATA_FILL, Drift, GOLD, Grid, INK, INK_SOFT, Line, Mark, Q_SIZE, Svg, X0 } from "./parts";
 
 const SUP: React.CSSProperties = { fontSize: "0.7em", verticalAlign: "0.45em", lineHeight: 0 };
-/** The chart's frame, in page x and layout y. */
-const CH = { x0: 1010, x1: 1770, nMax: 49152, yMax: 400e6 };
+/** The chart's frame, in page x and layout y: multiply-adds per layer over a
+ *  whole context, up to 20 trillion. */
+const CH = { x0: 1010, x1: 1770, nMax: 49152, yMax: 20e12 };
 
 /**
  * Question 8. Left: the pairs as squares, a thousand tokens and then two
- * thousand, the second four tiles of the first. Right: compute per token per
- * layer against context length (results.json cost.curve, from stated
- * sizes): the rest of the layer flat, attention rising, crossing at 24,576
- * tokens (yellow). Then, on the left, the variants teams reach for past that:
+ * thousand, the second four tiles of the first. Right: one layer's compute
+ * over the whole context against its length (results.json cost.totals, from
+ * stated sizes): the rest of the layer a straight line, since it grows
+ * linearly, attention a parabola, crossing at 24,576 tokens (yellow). It was
+ * per token until the 2026-11-26 review, which drew attention as a straight
+ * line and the rest as a flat one, under a narration saying the opposite. Then, on the left, the variants teams reach for past that:
  * sparse and sliding-window masks, and linear attention, a row of n cells
  * against the n-by-n square; and retrieval.
  */
@@ -62,10 +65,17 @@ export const CostScene: React.FC = () => {
   const axes = ease(frame, restAt, 14);
   const restP = ease(frame, restAt + 6, 20);
   const attnP = ease(frame, arithAt, 26);
-  const cross = ease(frame, pastAt, 12);
-  const pts = (key: "attention" | "rest") => C.curve.map((p) => `${px(p.n)},${py(p[key])}`).join(" L");
+  const crossIn = ease(frame, pastAt, 12);
+  const pts = (key: "attention" | "rest") => C.totals.map((p) => `${px(p.n)},${py(p[key])}`).join(" L");
+  const at = (n: number) => C.totals.find((p) => p.n === n) ?? C.totals[C.totals.length - 1];
+  const cross = at(C.crossover);
   const xTicks = [0, 10000, 20000, 30000, 40000];
-  const yTicks = [0, 100e6, 200e6, 300e6, 400e6];
+  // Every 4 trillion, so no rule runs through a curve's label.
+  const yTicks = [0, 4e12, 8e12, 12e12, 16e12, 20e12];
+  // Where the two labels sit: "attention" left of the parabola near its top,
+  // "the rest of the layer" under its line toward the right.
+  const attnLabel = at(45056);
+  const restLabel = at(36864);
 
   // ── The variants ──
   const V = 150;
@@ -124,7 +134,7 @@ export const CostScene: React.FC = () => {
         {/* ── Where attention overtakes the rest of a layer ── */}
         <ColumnRule x={880} top={y(330)} height={h(520)} at={restAt} />
         <Line at={restAt} x={CH.x0 - 60} y={y(318)} size={21} color={INK_SOFT}>
-          Multiply-adds per token, per layer (millions)
+          Multiply-adds in one layer, over the whole context (trillions)
         </Line>
         <Svg opacity={axes}>
           <line x1={CH.x0} x2={CH.x1} y1={cy0} y2={cy0} stroke={INK_SOFT} strokeWidth={1.4} />
@@ -132,7 +142,7 @@ export const CostScene: React.FC = () => {
             <React.Fragment key={t}>
               {t > 0 ? <line x1={CH.x0} x2={CH.x1} y1={py(t)} y2={py(t)} stroke={INK_SOFT} strokeWidth={1} opacity={0.25} /> : null}
               <text x={CH.x0 - 14} y={py(t) + 7} textAnchor="end" style={svgText(label(20, INK_SOFT))}>
-                {t / 1e6}
+                {t / 1e12}
               </text>
             </React.Fragment>
           ))}
@@ -148,20 +158,20 @@ export const CostScene: React.FC = () => {
         <Svg>
           <path d={`M${pts("rest")}`} fill="none" stroke={INK} strokeWidth={3} pathLength={1} strokeDasharray={`${restP} 1`} />
           <path d={`M${pts("attention")}`} fill="none" stroke={BAR} strokeWidth={3.4} pathLength={1} strokeDasharray={`${attnP} 1`} />
-          {cross > 0 ? (
-            <g opacity={cross}>
-              <line x1={px(C.crossover)} x2={px(C.crossover)} y1={py(C.linearPerToken)} y2={cy0} stroke={GOLD} strokeWidth={2} strokeDasharray="5 5" />
-              <circle cx={px(C.crossover)} cy={py(C.linearPerToken)} r={9} fill={GOLD} />
+          {crossIn > 0 ? (
+            <g opacity={crossIn}>
+              <line x1={px(C.crossover)} x2={px(C.crossover)} y1={py(cross.rest)} y2={cy0} stroke={GOLD} strokeWidth={2} strokeDasharray="5 5" />
+              <circle cx={px(C.crossover)} cy={py(cross.rest)} r={9} fill={GOLD} />
             </g>
           ) : null}
         </Svg>
-        <Line at={restAt + 16} x={CH.x0 + 20} y={py(C.linearPerToken) - h(44)} size={22}>
+        <Line at={restAt + 16} x={px(restLabel.n)} y={py(restLabel.rest) + h(18)} size={22}>
           the rest of the layer
         </Line>
-        <Line at={arithAt + 16} x={px(40000)} y={py(2 * 40000 * C.width) - h(64)} size={22} color={BLUE_INK}>
+        <Line at={arithAt + 16} x={px(attnLabel.n) - 24} y={py(attnLabel.attention) - h(30)} size={22} color={BLUE_INK} align="right" width={160}>
           attention
         </Line>
-        <Line at={pastAt + 4} x={px(C.crossover) + 20} y={py(C.linearPerToken) + h(30)} size={24} weight={600}>
+        <Line at={pastAt + 4} x={px(C.crossover) + 20} y={py(cross.rest) + h(30)} size={24} weight={600}>
           <Mark at={pastAt + 10}>
             <Num>{commas(C.crossover)}</Num> tokens
           </Mark>

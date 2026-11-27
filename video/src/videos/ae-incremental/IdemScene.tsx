@@ -189,7 +189,10 @@ export const IdemScene: React.FC = () => {
 
         {/* ── A rebuild that fails after its DROP ── */}
         <Note at={failAt} x={X0} y={row("failLabel")} out={routesAt - 4}>
-          <span style={{ ...label(22, INK), whiteSpace: "nowrap" }}>A rebuild whose CREATE fails, after the DROP</span>
+          {/* check.mjs makes it fail by pointing the CREATE at a table that
+              isn't there; the label says so, or the error names a table the
+              listing above never reads. */}
+          <span style={{ ...label(22, INK), whiteSpace: "nowrap" }}>A rebuild whose CREATE reads a missing table, after the DROP</span>
         </Note>
         <PgError x={X0} top={row("fail")} width={680} at={failAt + 6} out={routesAt - 4} message={REBUILD.failError} size={19} />
         <Note at={rollsAt} x={X0} y={row("back")} out={routesAt - 4}>

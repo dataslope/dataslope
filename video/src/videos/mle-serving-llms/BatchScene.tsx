@@ -130,7 +130,9 @@ export const BatchScene: React.FC = () => {
   const more = ease(frame, lessAt + 4, 20);
   const gridTop = y(500);
   const blocks = Math.ceil(PAGING.usedTokens / PAGING.blockTokens);
-  const lastFill = 9 / 16;
+  // 2,000 tokens fill 125 blocks of 16 exactly, so the last one ends full;
+  // while the blocks are handed out, the newest fills as the answer grows.
+  const lastFill = PAGING.lastBlockTokens / PAGING.blockTokens;
   const handed = Math.max(0, Math.min(blocks, ((frame - (growsAt + 4)) / 70) * blocks));
   const fork = { x: 1000, mid: y(560), a: y(496), b: y(624) };
   const sketch = { x: 1230, y0: y(880), w: 380, hh: h(160) };
@@ -271,7 +273,7 @@ export const BatchScene: React.FC = () => {
           <Line at={slotsAt} x={BX} y={rowY(cTop, 8) + h(22)} size={22} color={INK_SOFT}>
             Simulation: <Num>{BATCHING.slots}</Num> slots, <Num>{commas(BATCHING.requests)}</Num> requests, answers <Num>{BATCHING.min}</Num> to{" "}
             <Num>{commas(BATCHING.max)}</Num> tokens
-            <span style={{ opacity: ease(frame, shortAt, 12) }}>, mostly short</span>
+            <span style={{ opacity: ease(frame, shortAt, 12) }}>, mostly short, all waiting at the start</span>
           </Line>
         </Clear>
 
@@ -333,19 +335,13 @@ export const BatchScene: React.FC = () => {
               const c = k % PER_ROW;
               const p = Math.max(0, Math.min(1, handed - k));
               if (p <= 0) return null;
-              const last = k === blocks - 1;
+              const fill = p * (k === blocks - 1 ? lastFill : 1);
               const bx = X0 + c * PITCH;
               const by = gridTop + r * PITCH;
               return (
-                <g key={k} opacity={p}>
-                  {last ? (
-                    <>
-                      <rect x={bx} y={by} width={BLOCK} height={BLOCK} rx={4} fill={IDLE} />
-                      <rect x={bx} y={by} width={BLOCK * lastFill} height={BLOCK} rx={4} fill={CACHE} />
-                    </>
-                  ) : (
-                    <rect x={bx} y={by} width={BLOCK} height={BLOCK} rx={4} fill={CACHE} />
-                  )}
+                <g key={k}>
+                  {fill < 1 ? <rect x={bx} y={by} width={BLOCK} height={BLOCK} rx={4} fill={IDLE} /> : null}
+                  <rect x={bx} y={by} width={BLOCK * fill} height={BLOCK} rx={4} fill={CACHE} />
                 </g>
               );
             })}

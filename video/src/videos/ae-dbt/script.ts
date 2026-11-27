@@ -145,15 +145,21 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     adds one, which is why the schema name grows.)
  *   - "rapid-in": the RapidFire list, 11 to 19, one row each; the spots on
  *     their rows: the parcel on packages, the dashboard on exposures, the
- *     plug on dbt debug. "r-macros": the page's macro, and its two results
+ *     plug on dbt debug. "r-version": dim_customer's two version files, the
+ *     pinned ref, and pinned consumers moving when they choose to;
+ *     "r-version-latest": an unpinned ref -> latest_version, by default the
+ *     highest, v2, for everyone at once (red), and latest_version: 1 until
+ *     consumers have moved (green). "r-macros": the page's macro, and its two results
  *     from Postgres side by side, 19.99 (green) and 19 (red). "r-exposures":
  *     the graph's dashboard node, lit back along its two edges.
  *     "r-v2": the page's answer as key facts: the engine rewritten in Rust,
  *     generally available since September 2026, and on screen the name it
  *     first shipped under, the Fusion engine (read from the page by check.mjs;
  *     added after the review, on screen only, since "r-v2" was voiced on its
- *     own and a word changed there re-voices all of it); `dbt` the main distribution
- *     and `dbt Core` the Python 1.x line ending at 1.13; a misspelled column
+ *     own and a word changed there re-voices all of it); `dbt` the main distribution,
+ *     under dbt's own license, and `dbt OSS` its Apache 2.0 subset (both on
+ *     screen only, by the second review), and `dbt Core` the Python 1.x line
+ *     ending at 1.13; a misspelled column
  *     caught at compile time; `tests:` becoming `data_tests:`, the page's own
  *     first example of a 1.x deprecation a strict v2 refuses.
  *   - "next": the list complete; NextLine "Next: Incremental models".
@@ -216,6 +222,18 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     `dbt deps`, the pinned version), var() and --vars as JSON, exposures,
  *     docs generate and serve, dbt_project.yml and its cascade, versions
  *     (v1.5+, ref with a version), dbt debug and profiles.yml.
+ *  - "r-version-latest" (added by the second review, 2026-11-26) is dbt's
+ *    documented behavior, not the page's, which stops at pinning: a ref
+ *    with no version resolves to the model's latest_version, and that
+ *    defaults to the highest version (docs.getdbt.com, "Model versions":
+ *    "By default, the ref resolves to the latest version"; "If not
+ *    specified explicitly, the latest_version would be 2, because it's
+ *    numerically greatest"). So adding v2 moves every unpinned consumer at
+ *    once unless latest_version is held at 1, which the screen shows.
+ *  - "r-v2"'s licence (on screen only, added by the same review): the
+ *    page's "ships under dbt's own product license" and "dbt OSS is the
+ *    subset built entirely from Apache 2.0 code", quoted by check.mjs, which
+ *    reads "Apache 2.0" out of the page.
  *   - "subset-alone" (a model selected alone reads its parents as they stand
  *     in the target's schema) follows from the page's two statements that
  *     selection runs a subset and ref resolves to the active target's schema.
@@ -460,7 +478,7 @@ export const script: NarrationScript = {
     {
       id: "r-exposures",
       text: "Question fifteen. What are exposures in dbt? YAML entries for what reads your models: a dashboard, a machine learning model, a reverse ETL sync. They sit in the lineage graph, which is how question four's change reached the revenue dashboard.",
-      pauseAfter: 0.8,
+      pauseAfter: 1.4,
     },
     {
       id: "r-docs",
@@ -475,6 +493,13 @@ export const script: NarrationScript = {
     {
       id: "r-version",
       text: "Question eighteen. How do you version a dbt model? Since dbt one point five, declare versions in YAML, each with its own SQL file. Consumers pin one with ref and a version number, so a breaking change rolls out without forcing everyone across at once.",
+      pauseAfter: 0.8,
+    },
+    {
+      // Voiced on its own after the second review (2026-11-26): what an
+      // unpinned ref gets, which "pin one" left open.
+      id: "r-version-latest",
+      text: "A ref with no version gets the latest version, which defaults to the highest number. So set latest version to one until consumers have moved.",
       pauseAfter: 1.4,
     },
     {

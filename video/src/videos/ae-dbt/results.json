@@ -138,6 +138,7 @@
     "generallyAvailable": "September 2026",
     "coreLine": "1.x",
     "coreEndsAt": "1.13",
+    "ossLicense": "Apache 2.0",
     "testsKey": "data_tests"
   },
   "materializations": {

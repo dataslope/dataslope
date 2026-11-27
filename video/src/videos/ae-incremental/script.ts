@@ -121,7 +121,9 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     run's fct_events from question 2 (25 rows), event 3 struck from
  *     raw_events; the normal run finds nothing; three cells marked: 25 and 26
  *     missing, 3 extra (red). "refresh-fix": the full refresh: 26 rows, both
- *     EXCEPTs empty (green). "refresh-cost": the hook's chart again, the last
+ *     EXCEPTs empty (green). "refresh-schema" (added in the second review):
+ *     a grey line under the schema-change note, on_schema_change adding a
+ *     column with no refresh but leaving it empty in old rows. "refresh-cost": the hook's chart again, the last
  *     spike highlighted, "5,960,000 rows at day 720", and a two-bar split of
  *     the incremental model's two-year total: refreshes 87%, daily runs 13%.
  *     "refresh-rule": the takeaway line, "incremental: an optimization over a
@@ -216,6 +218,12 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     and both EXCEPTs are empty. "hard deletes", "schema changes": the
  *     warehousing page; "drops and rebuilds the table from scratch, ignoring
  *     is_incremental() entirely": dbt.mdx.
+ *   - "refresh-schema": dbt's own docs (incremental models, "What if the
+ *     columns of my incremental model change?"): on_schema_change
+ *     (append_new_columns, sync_all_columns) adds a new column on a normal
+ *     run, and "none of the on_schema_change behaviors backfill values in old
+ *     records for newly added columns"; a --full-refresh does. The page names
+ *     schema changes as a reason to refresh and stops there.
  *   - "refresh-rule": data-warehousing's "Treat incremental as an
  *     optimization over a correct full rebuild", and dbt.mdx's "scheduling
  *     one is not a substitute for correct incremental logic and may be
@@ -447,7 +455,12 @@ export const script: NarrationScript = {
     {
       id: "refresh-fix",
       text: "A full refresh reads all twenty-six and matches the source exactly. It's also how a schema change gets applied.",
-      pauseAfter: 0.7,
+      pauseAfter: 0.6,
+    },
+    {
+      id: "refresh-schema",
+      text: "Without a refresh, the on schema change config can add a new column, but leaves it empty in the old rows.",
+      pauseAfter: 1.0,
     },
     {
       id: "refresh-cost",

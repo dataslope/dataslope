@@ -78,7 +78,7 @@ export const GdScene: React.FC = () => {
         {/* ── The bowl ── */}
         <Bowl H={GD.bowl} centre={ols} levels={BOWL_LEVELS} x={sx} y={sy} at={gradAt - 6} clip={box} />
         <Axes x={sx} y={sy} xTicks={[-1, 0, 1, 2]} yTicks={[-1, 0, 1]} at={gradAt - 8} />
-        <div style={{ position: "absolute", left: box.left + box.width - 40, top: box.top + box.height + 34, ...label(24, INK_SOFT) }}>
+        <div style={{ position: "absolute", left: box.left + box.width - 40, top: box.top + box.height + 34, ...label(24, INK_SOFT), opacity: ease(frame, gradAt, 12) }}>
           <MathRun>
             <I>θ</I>
             <sub style={{ fontSize: "0.68em" }}>1</sub>
@@ -120,7 +120,22 @@ export const GdScene: React.FC = () => {
         </Line>
 
         <Line at={rowsAt - 2} x={R} y={y(500)} size={26}>
-          100 noisy rows from weights 1, 2, −1
+          {GD.rows} noisy rows from weights{" "}
+          <MathRun>
+            <I>θ</I>
+            <sub style={{ fontSize: "0.68em" }}>0</sub>, <I>θ</I>
+            <sub style={{ fontSize: "0.68em" }}>1</sub>, <I>θ</I>
+            <sub style={{ fontSize: "0.68em" }}>2</sub>
+          </MathRun>{" "}
+          = {GD.true.map((v) => num(v, 0)).join(", ")}
+        </Line>
+        {/* The plot is a slice: θ1 and θ2, with θ0 (the bias) at its best. */}
+        <Line at={rowsAt + 8} x={box.left} y={box.top + box.height + h(84)} size={22} color={INK_SOFT}>
+          <MathRun>
+            <I>θ</I>
+            <sub style={{ fontSize: "0.68em" }}>0</sub>
+          </MathRun>
+          , the bias, held at its best
         </Line>
         <Line at={zeroAt} x={R} y={y(556)} size={26} color={INK_SOFT}>
           From zero, 500 steps at <MathRun><I>η</I> = 0.01</MathRun>

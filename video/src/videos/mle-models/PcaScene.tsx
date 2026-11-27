@@ -121,6 +121,10 @@ export const PcaScene: React.FC = () => {
           <Line at={tenAt - 2} x={R} y={y(320)} size={24} color={INK_SOFT}>
             The page&apos;s 10 scaled features: variance per component
           </Line>
+          {/* Why scaled: PCA follows variance, so units would decide it. */}
+          <Line at={tenAt + 24} x={R} y={y(362)} size={22} color={INK_SOFT}>
+            Scaled first: raw, the widest unit would take the 1st component
+          </Line>
           <Svg opacity={ease(frame, tenAt, 12)}>
             <line x1={bx - 6} x2={bx + 10 * (bw + 8)} y1={bBase + 0.5} y2={bBase + 0.5} stroke={INK} strokeWidth={1.6} />
             {PCA.full.map((v, i) => {

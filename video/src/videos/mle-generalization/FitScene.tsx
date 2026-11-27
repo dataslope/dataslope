@@ -318,7 +318,8 @@ export const FitScene: React.FC = () => {
           <Say at={sevenAt + 10} x={bx + 14} y={(bTop + bBottom) / 2 - 18}>
             <span style={line(26, LIT_INK)}>bias</span>
           </Say>
-          <Say at={sevenAt} x={LINE.left + 190} y={at(ly, 11.8)}>
+          {/* Between the 10 and 20 gridlines, so neither runs under it. */}
+          <Say at={sevenAt} x={LINE.left + 190} y={at(ly, 14.2)}>
             <span style={line(23, INK)}>
               both near <span style={TABULAR}>7</span>
               <span style={{ opacity: ease(frame, moveAt - 2, 10) }}>, and more rows won’t move them</span>

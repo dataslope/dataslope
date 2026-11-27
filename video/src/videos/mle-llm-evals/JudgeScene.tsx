@@ -98,7 +98,8 @@ const SplitBar: React.FC<{
  * in yellow, so the eye sees the first-shown answer win about two thirds of
  * each bar while the winner changes. What it means (at least 35% of the
  * verdicts flipped, and the arithmetic). Then each bias's fix in green
- * beside it, the calibration against experts, and the judge relabelled when
+ * beside it, the calibration against experts and the bar it has to clear
+ * (the experts' agreement with each other), and the judge relabelled when
  * it changes.
  */
 export const JudgeScene: React.FC = () => {
@@ -151,6 +152,10 @@ export const JudgeScene: React.FC = () => {
   const chanceAt = n.word("q2-cal", "corrected for chance");
   const kappaAt = n.word("q2-cal", "Cohen's kappa");
   const relyAt = n.word("q2-cal", "before you rely");
+  /** The bar a calibrated judge has to clear: the experts' agreement with
+   *  each other. */
+  const barAt = n.word("q2-bar", "The bar");
+  const wellAt = n.word("q2-bar", "about as well as");
 
   const changeAt = n.word("q2-again", "Change the judge's model");
   const newAt = n.word("q2-again", "a new instrument");
@@ -159,7 +164,8 @@ export const JudgeScene: React.FC = () => {
 
   const ry = (i: number) => y(ROW[i]);
   const calY = y(668);
-  const judgeBox = { cx: X0 + 160, cy: y(800), w: 320, h: 66 };
+  const barY = calY + 104;
+  const judgeBox = { cx: X0 + 160, cy: barY + 108, w: 320, h: 66 };
   const relabel = ease(frame, changeAt + 2, 12);
 
   return (
@@ -178,6 +184,7 @@ export const JudgeScene: React.FC = () => {
         <Sfx key={f.text} name="el-tap" at={f.at} level={-31} />
       ))}
       <Sfx name="el-pencil" at={kappaAt} level={-36} />
+      <Sfx name="el-tap" at={barAt + 2} level={-32} />
       <Sfx name="el-pop" at={againAt + 2} level={-31} />
 
       <Drift from={from} to={end + 40}>
@@ -219,8 +226,10 @@ export const JudgeScene: React.FC = () => {
           {SOURCES.judge}
         </Line>
 
-        {/* The page's case: the same pairs in both orders. */}
-        <Clear at={fixes[0].at - 6}>
+        {/* The page's case: the same pairs in both orders. It clears in the
+            pause before the fixes, so it is gone before the first one inks
+            in where its bars were. */}
+        <Clear at={fixFrom - 20}>
           <SplitBar
             top={y(BAR_TOP[0])}
             at={aFirstAt - 6}
@@ -280,6 +289,12 @@ export const JudgeScene: React.FC = () => {
         </Line>
         <Line x={X0} y={calY + 54} at={expertsAt + 4} size={22} color={INK_SOFT}>
           Worked through on the Data Scientist track
+        </Line>
+        <Line x={X0} y={barY} at={barAt} size={26}>
+          The bar: <Fade at={barAt + 8}>judge–expert agreement</Fade>{" "}
+          <Fade at={wellAt}>
+            <MathRun>≈</MathRun> expert–expert agreement
+          </Fade>
         </Line>
         <Box
           r={judgeBox}

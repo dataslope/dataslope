@@ -82,7 +82,8 @@ export const ObserveScene: React.FC = () => {
   const headsTop = y(HEADS_Y);
   const base = y(BASE_Y);
   const max = Math.max(...OBSERVE.volume.map((v) => v.rows));
-  const barH = (rows: number) => (rows / max) * h(170);
+  // Scaled so the "30" over the taller bar keeps 40 px under the column head.
+  const barH = (rows: number) => (rows / max) * h(150);
   const rowsTop = y(ROWS_Y);
   const rowY = (i: number) => rowsTop + i * h(ROW);
 

@@ -2,8 +2,9 @@
 // in Pyodide 314.0.7 with scikit-learn and NumPy, the runtime the Machine
 // Learning Engineer pages' blocks run in the reader's browser, and writes what
 // came back to results.json, which data.ts reads. Every random draw is seeded,
-// so a rerun writes the same file (the three SVM fit times excepted: they are
-// measured, once, and only their ratio is said). From the repo root:
+// so a rerun writes the same file; the three SVM fit times, measured once and
+// said only as a ratio, are kept from the existing results.json (RETIME=1 to
+// measure them again). From the repo root:
 //
 //   node video/src/videos/mle-models/check.mjs
 //
@@ -31,6 +32,16 @@ const here = dirname(fileURLToPath(import.meta.url));
 const require = createRequire(join(here, "../../../../package.json"));
 const { loadPyodide } = require("pyodide");
 const py = await loadPyodide({ packages: ["numpy", "pandas", "scikit-learn"] });
+// The SVM fit times were measured once, and only their ratio is said: a rerun
+// keeps them from results.json, so every other change can be checked against
+// a file that otherwise comes back byte for byte. RETIME=1 measures again.
+let kept = null;
+try {
+  kept = JSON.parse(readFileSync(join(here, "results.json"), "utf8")).svm.fitSeconds;
+} catch {
+  kept = null;
+}
+py.globals.set("KEPT_TIMES", process.env.RETIME || !kept ? "" : JSON.stringify(kept));
 
 const out = py.runPython(String.raw`
 import itertools, json, math, sys, time, warnings
@@ -155,6 +166,11 @@ for e in range(10):
         rt.append([float(f"{lrs[k]:.4g}"), r4(min(loss(th), 1e6))]); k += 1
 lowest = min(rt, key=lambda r: r[1])
 blowup = next(r for r in rt if r[0] > lowest[0] and r[1] > 10 * rt[0][1])
+# The turn: the first rate past the bottom, above 1.5, whose loss has doubled.
+# The usual reading of the test picks well below it, on the steep stretch:
+# the step nearest a tenth of the turn.
+turn = next(r for r in rt if r[0] > lowest[0] and r[1] > 2 * lowest[1] and r[0] > 1.5)
+tenth = min(rt, key=lambda r: abs(math.log10(r[0]) - math.log10(turn[0] / 10)))
 # Decay: single rows for twenty passes at 0.1, constant against a cosine to
 # zero, twenty seeds each: the mean distance left from the best answer.
 cosine = lambda k, T, lr: lr * 0.5 * (1 + math.cos(math.pi * k / T))
@@ -163,7 +179,7 @@ def ends(schedule):
 WARM, STEPS = 50, 1000
 shape = [[k, r4(1.0 * (k / WARM) if k < WARM else 0.5 * (1 + math.cos(math.pi * (k - WARM) / (STEPS - WARM))))] for k in range(0, STEPS + 1, 10)]
 R["lr"] = {
-    "range": rt, "lowest": lowest, "blowup": blowup,
+    "range": rt, "lowest": lowest, "blowup": blowup, "turn": turn, "tenth": tenth,
     "constant": r4(ends(None)), "cosine": r4(ends(cosine)), "decayPasses": 20,
     "schedule": shape, "warmup": WARM, "steps": STEPS,
 }
@@ -236,14 +252,18 @@ svs = {}
 for m_ in [200, 2000, 20000]:
     Xm, ym = make_circles(n_samples=m_, noise=0.2, factor=0.5, random_state=0)
     svs[str(m_)] = int(SVC().fit(Xm, ym).n_support_.sum())
-times = {}
-for m_ in [4000, 8000, 16000]:
+times = json.loads(KEPT_TIMES) if KEPT_TIMES else {}
+for m_ in [] if times else [4000, 8000, 16000]:
     Xm, ym = make_circles(n_samples=m_, noise=0.2, factor=0.5, random_state=0)
     t0 = time.perf_counter(); SVC().fit(Xm, ym); times[str(m_)] = round(time.perf_counter() - t0, 3)
+# Each model's decision function on the same grid, for the boundary (its zero
+# contour) and the margin (its contours at -1 and +1) drawn smooth.
+dec = lambda m: [[r2(v) for v in row] for row in m.decision_function(G).reshape(64, 64)]
 R["svm"] = {
     "linear": r3(lin.score(Xrte, yrte)), "rbf": r3(rbf.score(Xrte, yrte)),
     "x": [r2(v) for v in Xrtr[:400, 0]], "y": [r2(v) for v in Xrtr[:400, 1]], "label": [int(v) for v in yrtr[:400]],
     "support": [int(i) for i in rbf.support_ if i < 400], "range": [-1.6, 1.6], "gridLinear": grid(lin), "gridRbf": grid(rbf),
+    "decisionLinear": dec(lin), "decisionRbf": dec(rbf),
     "supportVectors": svs, "fitSeconds": times,
     "doubling": [r2(times["8000"] / times["4000"]), r2(times["16000"] / times["8000"])],
 }
@@ -460,7 +480,8 @@ const claims = [
   ["lr-band", "nearly twelve hundred steps"],
   ["lr-band", `at point nine, it settles in ${whole(R.gd.settle["0.9"])}`],
   ["lr-band", "past about two"],
-  ["lr-range", "from about point five, and turns up at two"],
+  ["lr-range-read", "from about point five, and turns up at two"],
+  ["lr-range-pick", "still falling steeply, about a tenth of where it turns up"],
   ["lr-sched", `about ${point(R.lr.constant.toFixed(2))} from the best answer`],
   ["lr-sched", `about ${point(R.lr.cosine.toFixed(3))}`],
   ["logit-run", `scores ${pct(R.logit.accuracy)} percent on ${whole(R.logit.testRows)} held-out rows`],
@@ -495,6 +516,14 @@ fact(R.gd.limit > 1.9 && R.gd.limit < 2.05 && R.gd.diverges["2.0"] && R.gd.diver
 fact(R.lr.lowest[0] > 0.4 && R.lr.lowest[0] < 0.7, `the range test bottoms out at ${R.lr.lowest[0]}, not "about point five"`);
 const turn = R.lr.range.find((r) => r[0] > R.lr.lowest[0] && r[1] > 2 * R.lr.lowest[1] && r[0] > 1.5);
 fact(turn && turn[0] > 1.8 && turn[0] < 2.2, `the range test turns up at ${turn && turn[0]}, not "at two"`);
+// "Pick a rate where it's still falling steeply, about a tenth of where it
+// turns up": the step nearest a tenth of the turn is on the steep stretch,
+// its loss well above the bottom and falling fast into the next steps.
+const tenthAt = R.lr.range.findIndex((r) => r[0] === R.lr.tenth[0]);
+fact(
+  R.lr.turn[0] === turn[0] && tenthAt > 0 && R.lr.tenth[1] > 5 * R.lr.lowest[1] && R.lr.range[tenthAt + 2][1] < 0.7 * R.lr.tenth[1] && R.lr.tenth[0] < R.lr.lowest[0] / 2,
+  `a tenth of the turn (${JSON.stringify(R.lr.tenth)}) is not on the steep stretch`,
+);
 fact(R.ce.ceSteps < R.ce.mseSteps / 5, "cross-entropy is not far quicker than squared error");
 fact(R.knn.raw === R.knn.incomeOnly, `"exactly what income alone scores": ${R.knn.raw} against ${R.knn.incomeOnly}`);
 fact(R.scale.times100.steps > 70000 && R.scale.times100.steps < 80000, `"nearly eighty thousand": ${R.scale.times100.steps}`);

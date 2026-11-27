@@ -27,6 +27,7 @@ import {
   MARK_GREEN,
   MARK_RED,
   OK_INK,
+  pulse,
   QMono,
   rowsAt,
   Spot,
@@ -191,7 +192,7 @@ export const LatestScene: React.FC = () => {
       <Sfx name="el-pencil" at={numberAt + 4} level={-35} />
       <Sfx name="el-tap" at={keepAt + 2} level={-33} />
       <Sfx name="el-pop" at={twelveAt + 2} level={-32} />
-      <Sfx name="el-scratch" at={saysAt + 2} level={-34} />
+      <Sfx name="el-scratch" at={cantAt + 18} level={-34} />
       <Sfx name="el-scratch" at={losesAt + 6} level={-34} />
       <Sfx name="el-pop" at={sameAt} level={-30} />
       <Sfx name="el-tap" at={rankAt + 4} level={-33} />
@@ -272,7 +273,20 @@ export const LatestScene: React.FC = () => {
         {/* ── The window in WHERE, refused ── */}
         <Stage from={cantAt - 4} to={maxAt - 4}>
           <Listing lines={Wh.lines} x={R_X} top={y(TOP)} size={SIZE} at={cantAt - 4} marks={[{ line: "WHERE ROW_NUMBER()", at: cantAt + 6, color: MARK_RED }]} />
-          <ErrorBox x={R_X} top={y(TOP) + whH + h(22)} width={640} at={saysAt} kind={Wh.kind} message={Wh.message} size={21} />
+          {/* Up while the reason is given, after the red band reaches the WHERE
+              line, so Postgres's words are still there on "Postgres says
+              so", when the box nods once; wide enough for the message on
+              one line. */}
+          <div
+            style={{
+              position: "absolute",
+              inset: 0,
+              transform: `scale(${1 + 0.035 * pulse(frame, saysAt, 18)})`,
+              transformOrigin: `${R_X}px ${y(TOP) + whH + h(52)}px`,
+            }}
+          >
+            <ErrorBox x={R_X} top={y(TOP) + whH + h(22)} width={660} at={cantAt + 16} kind={Wh.kind} message={Wh.message} size={21} />
+          </div>
         </Stage>
 
         {/* ── GROUP BY with MAX: the times, not the email ── */}

@@ -11,7 +11,7 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { ds } from "../../theme/brand";
 import { RAPID } from "./data";
-import { Area, BAD, Curve, DATA, Drift, Headline, Kicker, Line, Mark, MUTED, mulberry32, normalPoints, OK, POINT, Spot, Svg, X0 } from "./parts";
+import { Area, BAD, Curve, DATA, Drift, Headline, Kicker, Line, Mark, MUTED, mulberry32, normalPoints, POINT, Spot, Svg, X0 } from "./parts";
 
 const R_X = 800;
 const R_X1 = 1790;
@@ -222,11 +222,11 @@ const Sampling: React.FC<{ c: Ctx }> = ({ c }) => {
         const b = box(i);
         const p = ease(frame, at[i], 12);
         if (p <= 0) return null;
-        const dots: { x: number; y: number; pick: boolean; color?: string }[] = [];
+        const dots: { x: number; y: number; pick: boolean }[] = [];
         if (i === 0) field.forEach((d) => dots.push({ x: b.x + 16 + d.c * 36, y: b.y + 20 + d.r * 34, pick: d.pick }));
         if (i === 1)
           [12, 12, 4].forEach((count, band) => {
-            for (let k = 0; k < count; k++) dots.push({ x: b.x + 16 + k * 36, y: b.y + 20 + band * 46, pick: band === 2 ? k < 2 : k % 4 === 1, color: band === 2 ? ds("purple", 500) : undefined });
+            for (let k = 0; k < count; k++) dots.push({ x: b.x + 16 + k * 36, y: b.y + 20 + band * 46, pick: band === 2 ? k < 2 : k % 4 === 1 });
           });
         if (i === 2)
           [0, 1, 2, 3, 4, 5].forEach((g) => {
@@ -243,7 +243,7 @@ const Sampling: React.FC<{ c: Ctx }> = ({ c }) => {
                 : null}
               {i === 2
                 ? [0, 1, 2, 3, 4, 5].map((g) => (
-                    <rect key={g} x={b.x + 14 + (g % 3) * 140} y={b.y + 6 + Math.floor(g / 3) * 64} width={92} height={58} rx={8} fill="none" stroke={g === 1 || g === 5 ? OK : HAIRLINE} strokeWidth={g === 1 || g === 5 ? 2.5 * lit(i) + 1 : 1.2} />
+                    <rect key={g} x={b.x + 14 + (g % 3) * 140} y={b.y + 6 + Math.floor(g / 3) * 64} width={92} height={58} rx={8} fill="none" stroke={g === 1 || g === 5 ? DATA : HAIRLINE} strokeWidth={g === 1 || g === 5 ? 2.5 * lit(i) + 1 : 1.2} />
                   ))
                 : null}
               {i === 3
@@ -264,7 +264,7 @@ const Sampling: React.FC<{ c: Ctx }> = ({ c }) => {
                   })()
                 : null}
               {dots.map((d, k) => (
-                <circle key={k} cx={d.x} cy={d.y} r={9} fill={d.pick && lit(i) > 0.5 ? (d.color && ease(frame, rareAt, 8) > 0.5 ? d.color : OK) : (d.color ?? MUTED)} />
+                <circle key={k} cx={d.x} cy={d.y} r={9} fill={d.pick && lit(i) > 0.5 ? DATA : MUTED} />
               ))}
             </Svg>
             <Line at={at[i]} x={b.x} y={b.y + cellH} size={24} weight={600}>
@@ -435,9 +435,10 @@ const Cause: React.FC<{ c: Ctx }> = ({ c }) => {
   const hotAt = c.w("r-cause", "hot weather drives");
   const iceAt = c.w("r-cause", "ice cream sales");
   const drownAt = c.w("r-cause", "and drownings");
-  const predictAt = c.w("r-cause", "A model can predict from a correlation");
-  const decideAt = c.w("r-cause", "Deciding what to change");
-  const rctAt = c.w("r-cause", "a randomized experiment");
+  const otherAt = c.w("r-cause-other", "the cause runs the other way");
+  const predictAt = c.w("r-cause-act", "A model can predict from a correlation");
+  const decideAt = c.w("r-cause-act", "Deciding what to change");
+  const rctAt = c.w("r-cause-act", "a randomized experiment");
   const hot = { x: 1240, y: c.y(330), w: 280 };
   const ice = { x: R_X, y: c.y(560), w: 300 };
   const drown = { x: 1400, y: c.y(560), w: 300 };
@@ -466,6 +467,10 @@ const Cause: React.FC<{ c: Ctx }> = ({ c }) => {
       </Line>
       <Line at={isntAt} x={R_X} y={hot.y + 18} size={24} weight={600}>
         Correlation isn&apos;t causation
+      </Line>
+      {/* The page's other two reasons, beside the one the diagram draws. */}
+      <Line at={otherAt} x={R_X} y={hot.y + 18 + c.h(44)} size={22} color={INK_SOFT}>
+        Or reverse causation, or chance
       </Line>
       <Spot id="ice-cream" at={iceAt} x={ice.x + 70} y={ice.y + BOX_H + 84} w={iceW} />
       <Line at={predictAt} x={1100} y={c.y(720)} size={24}>

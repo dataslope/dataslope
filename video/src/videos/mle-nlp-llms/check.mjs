@@ -173,6 +173,9 @@ R["cost"] = {
     "pairs": {str(n): n * n for n in [1000, 2000, 4000, 8000]},
     "width": dm, "ffnMultiple": 4, "linearPerToken": 12 * dm * dm, "crossover": 6 * dm,
     "curve": [{"n": n, "attention": 2 * n * dm, "rest": 12 * dm * dm} for n in range(0, 49153, 2048)],
+    # The same over a whole sequence of n tokens, per layer: attention 2 n^2 d
+    # (quadratic), the rest 12 n d^2 (linear). Same crossover, at n = 6 d.
+    "totals": [{"n": n, "attention": 2 * n * n * dm, "rest": 12 * n * dm * dm} for n in range(0, 49153, 1024)],
 }
 
 # ── 12. LoRA, from stated sizes ──
@@ -247,6 +250,14 @@ const quotes = [
   ["nlp-and-llms.mdx", "Every token in the prompt is paid for on every request"],
   ["nlp-and-llms.mdx", "answer quality tends to fall as the context fills with loosely relevant text"],
   ["nlp-and-llms.mdx", "A model that already reasons before it answers does this internally, so asking again mostly adds tokens and latency"],
+  // The 2026-11-26 review's additions: q1-bpe, q7-grad and r-random-host, and
+  // the notes for skip-gram and CBOW and for the other PEFT methods.
+  ["nlp-and-llms.mdx", "byte-pair encoding (BPE), WordPiece, the unigram model"],
+  ["nlp-and-llms.mdx", "or CBOW does the reverse"],
+  ["nlp-and-llms.mdx", "(gradients vanish over many steps)"],
+  ["nlp-and-llms.mdx", "Adapters and prefix tuning are similar ideas"],
+  ["nlp-and-llms.mdx", "A hosted model may fix them: reasoning models in particular often reject a request that sets them"],
+  ["nlp-and-llms.mdx", "there you steer with the prompt, a reasoning-effort setting, and structured outputs"],
 ];
 for (const [file, phrase] of quotes) if (!page(file).includes(phrase.replace(/\s+/g, " "))) problems.push(`${file} no longer says: ${phrase}`);
 
@@ -278,6 +289,7 @@ const says = [
   ["q8-a", "a million pairs", R.cost.pairs["1000"] === 1e6],
   ["q8-a", "four million", R.cost.pairs["2000"] === 4e6],
   ["q8-when", "twenty-five thousand", Math.round(R.cost.crossover / 1000) === 25],
+  ["q8-when", "only grows linearly", R.cost.totals.every((p) => p.rest === p.n * R.cost.linearPerToken) && R.cost.totals.some((p) => p.n === R.cost.crossover && p.attention === p.rest)],
   ["q12-math", "seventeen million", Math.round(R.lora.full / 1e6) === 17],
   ["q12-math", "sixty-five thousand", Math.round(R.lora.adapter / 1000) === 66 || Math.floor(R.lora.adapter / 1000) === 65],
   ["q12-math", "under half a percent", R.lora.share < 0.005],

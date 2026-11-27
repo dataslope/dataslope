@@ -190,7 +190,9 @@ export const ReviewScene: React.FC = () => {
         {/* The grain: one row per order_id, and nothing proving it. */}
         <Clear at={pairFrom}>
           <Ink at={uniqueAt} dur={12} style={{ left: X0, top: top + listingHeight(lines.length, SIZE) + h(24) }}>
-            <span style={{ ...line24, color: ACCENT_INK }}>No unique test on order_id</span>
+            <span style={{ ...line24, color: ACCENT_INK }}>
+              No unique test on <span style={CODE}>order_id</span>
+            </span>
           </Ink>
         </Clear>
         <Listing
@@ -325,7 +327,9 @@ export const ReviewScene: React.FC = () => {
             </span>
           </Ink>
           <Ink at={withKeyAt} dur={12} style={{ left: R_X, top: y(774) }}>
-            <span style={{ ...label(22, INK), whiteSpace: "nowrap" }}>Merged on order_id</span>
+            <span style={{ ...label(22, INK), whiteSpace: "nowrap" }}>
+              Merged on <span style={CODE}>order_id</span>
+            </span>
           </Ink>
           <Chips ids={mergedIds} red={() => false} at={withKeyAt + 4} left={R_X} top={y(774) + h(40)} />
           <Ink at={withKeyAt + 10} dur={12} style={{ left: R_X + mergedIds.length * 40 + 16, top: y(774) + h(40) + 2 }}>
@@ -348,6 +352,8 @@ export const ReviewScene: React.FC = () => {
 };
 
 const line24: React.CSSProperties = { ...note(24, INK), whiteSpace: "nowrap" };
+/** Code in a note: the mono face at 0.92em, as the listing above sets it. */
+const CODE: React.CSSProperties = { fontFamily: MONO, fontSize: "0.92em", fontVariantLigatures: "none" };
 
 /** The index of the first line that holds `text` (lineOf for lines that are
  *  not marks: the model's config, filter and from lines). */

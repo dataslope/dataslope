@@ -103,11 +103,14 @@ const Validate: React.FC<{ c: Ctx }> = ({ c }) => {
   const rowY = (i: number) => top + c.h(44) + i * c.h(38);
   const nullLit = ease(frame, nullAt, 10);
   const unitLit = ease(frame, unitsAt, 10);
+  // A new column is a schema change (the page's "silent schema changes (a
+  // new null column ...)"), so schema fails with completeness on the null
+  // column, and ranges and distributions on the unit change.
   const checks = [
-    { t: "schema", at: schemaAt, fail: 0 },
-    { t: "ranges", at: rangesAt, fail: unitLit },
-    { t: "distributions", at: distAt, fail: unitLit },
-    { t: "completeness", at: completeAt, fail: nullLit },
+    { t: "schema", at: schemaAt, fail: nullLit, crossAt: nullAt + 8 },
+    { t: "ranges", at: rangesAt, fail: unitLit, crossAt: unitsAt + 8 },
+    { t: "distributions", at: distAt, fail: unitLit, crossAt: unitsAt + 8 },
+    { t: "completeness", at: completeAt, fail: nullLit, crossAt: nullAt + 8 },
   ];
   return (
     <>
@@ -145,7 +148,7 @@ const Validate: React.FC<{ c: Ctx }> = ({ c }) => {
         const failed = k.fail > 0.5;
         return (
           <div key={k.t} style={{ position: "absolute", left: 1360, top: top + c.h(10) + i * c.h(52), display: "flex", alignItems: "center", gap: 12, opacity: p, whiteSpace: "nowrap" }}>
-            <span style={{ width: 26, height: 26, display: "inline-flex" }}>{failed ? <Cross at={i === 3 ? nullAt + 8 : unitsAt + 8} size={26} /> : <Tick at={k.at + 4} size={26} color={OK} />}</span>
+            <span style={{ width: 26, height: 26, display: "inline-flex" }}>{failed ? <Cross at={k.crossAt} size={26} /> : <Tick at={k.at + 4} size={26} color={OK} />}</span>
             <span style={{ ...label(22, failed ? ACCENT_INK : INK), fontWeight: 500 }}>{k.t}</span>
           </div>
         );
@@ -257,7 +260,7 @@ const Distill: React.FC<{ c: Ctx }> = ({ c }) => {
   const S = { x: 1500, w: 200 };
   return (
     <>
-      <Node x={T.x} y={mid - 50} w={T.w} h={100} at={teacherAt} title="Teacher" sub="large: our digit network" />
+      <Node x={T.x} y={mid - 50} w={T.w} h={100} at={teacherAt} title="Teacher" sub="here, our digit network" />
       <Flow points={[[T.x + T.w + 3, mid], [S.x - 3, mid]]} at={teacherAt + 8} color={BAR} />
       <Line at={teacherAt + 10} x={(T.x + T.w + S.x) / 2} y={mid - 44} size={21} color={BLUE_INK} align="center" width={420}>
         its probabilities
@@ -265,7 +268,7 @@ const Distill: React.FC<{ c: Ctx }> = ({ c }) => {
       <Line at={labelsAt} x={(T.x + T.w + S.x) / 2} y={mid + 14} size={21} color={INK_SOFT} align="center" width={420}>
         not just the labels
       </Line>
-      <Node x={S.x} y={mid - 34} w={S.w} h={68} at={studentAt} title="Student" sub="small" size={22} />
+      <Node x={S.x} y={mid - 34} w={S.w} h={68} at={studentAt} title="Student" sub="smaller" size={22} />
       <Digit image={SOFT.image} px={13} x={BX} y={chartTop + 6} at={nineAt} />
       <Line at={nineAt + 4} x={BX} y={chartTop + 6 + 104 + 14} size={20} color={INK_SOFT}>
         a held-out nine
@@ -344,8 +347,10 @@ const Latency: React.FC<{ c: Ctx }> = ({ c }) => {
 // ── 17. Scaling under variable load ─────────────────────────────────────────
 
 /** The load through the beat (0 to 1 of its length): steady, a spike, then
- *  steady again. */
-const loadAt = (u: number) => 0.32 + 0.62 * Math.exp(-(((u - 0.42) / 0.11) ** 2));
+ *  steady again. The spike peaks around "a request queue in front", so the
+ *  queue is deepest while the narration says it holds the spike, and the
+ *  replica that was warming up drains it on "instead of being dropped". */
+const loadAt = (u: number) => 0.32 + 0.62 * Math.exp(-(((u - 0.6) / 0.12) ** 2));
 
 const Scale: React.FC<{ c: Ctx }> = ({ c }) => {
   const frame = useCurrentFrame();
@@ -355,7 +360,6 @@ const Scale: React.FC<{ c: Ctx }> = ({ c }) => {
   const depthAt = c.w("r-scale", "utilization or queue depth");
   const warmAt = c.w("r-scale", "take time to warm up");
   const queueAt = c.w("r-scale", "a request queue in front");
-  const waitAt = c.w("r-scale", "lets a spike wait");
   const droppedAt = c.w("r-scale", "instead of being dropped");
   const endAt = n.beat("r-scale").to + 20;
   const top = c.y(352);
@@ -365,14 +369,14 @@ const Scale: React.FC<{ c: Ctx }> = ({ c }) => {
   const span = Math.max(1, endAt - startAt);
   const uNow = clamp01((frame - startAt) / span);
   const uOf = (f: number) => clamp01((f - startAt) / span);
-  const uReady = uOf(waitAt + 6);
+  const uReady = uOf(droppedAt);
   const capAt = (u: number) => (u < uReady ? 0.6 : 0.9);
   // The queue: what arrives beyond capacity waits, and drains once it can.
   let q = 0;
   const steps = 120;
   for (let i = 1; i <= steps; i++) {
     const u = (i / steps) * uNow;
-    q = Math.max(0, q + (loadAt(u) - capAt(u)) * (uNow / steps) * 9);
+    q = Math.max(0, q + (loadAt(u) - capAt(u)) * (uNow / steps) * 14);
   }
   const queued = Math.min(30, Math.round(q * 26));
   const pts = Array.from({ length: 81 }, (_, i) => i / 80).map((u) => `${chart.x0 + u * (chart.x1 - chart.x0)},${chart.top + chart.h * (1 - loadAt(u))}`);
@@ -380,7 +384,7 @@ const Scale: React.FC<{ c: Ctx }> = ({ c }) => {
   const laneY = top + c.h(270);
   const replicaX = 1580;
   const spawned = frame >= warmAt - 12;
-  const ready = frame >= waitAt + 6;
+  const ready = frame >= droppedAt;
   const ry = (i: number) => laneY - c.h(96) + i * c.h(96) - 30;
   return (
     <>
@@ -424,7 +428,7 @@ const Scale: React.FC<{ c: Ctx }> = ({ c }) => {
             {warming ? null : (
               <Flow
                 points={i === 1 ? [[replicaX - 40, laneY], [replicaX - 3, laneY]] : [[replicaX - 40, laneY], [replicaX - 40, ry(i) + 30], [replicaX - 3, ry(i) + 30]]}
-                at={isNew ? waitAt + 6 : startAt + 8}
+                at={isNew ? droppedAt : startAt + 8}
                 color={BAR}
                 head={11}
                 width={2}

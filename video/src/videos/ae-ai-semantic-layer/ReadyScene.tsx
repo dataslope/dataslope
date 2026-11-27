@@ -21,6 +21,8 @@ const MODELS = [
   { name: "fct_orders", access: "public" },
 ] as const;
 const MODEL_W = 200;
+/** Code in a note: the mono face at 0.92em, as the listing beside it sets it. */
+const CODE: React.CSSProperties = { fontFamily: MONO, fontSize: "0.92em", fontVariantLigatures: "none" };
 const MODEL_GAP = 50;
 
 /**
@@ -68,7 +70,6 @@ export const ReadyScene: React.FC = () => {
   const inputFrom = n.beat("ready-caution").from;
   const inputAt = n.word("ready-caution", "documentation is now an input");
   const dropAt = n.word("ready-input", "Drop the words");
-  const letterAt = n.word("ready-input", "writing its own SQL from it");
   const reportsAt = n.word("ready-input", "eleven hundred ninety");
   const reviewAt = n.word("ready-review", "review them like code");
   const end = n.beat("ready-review").to;
@@ -249,7 +250,9 @@ export const ReadyScene: React.FC = () => {
           <Spot id="ae-ai-semantic-layer-padlock" at={martsAt + 26} left={ASST_X - padlock.width - 36} top={asstTop + modelH / 2 - padlock.height / 2} {...padlock} />
           {/* What private does do, under the private models. */}
           <Ink at={buildAt} dur={12} style={{ left: modelX(0), top: modelTop + modelH + h(12) }}>
-            <div style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>Private stops ref(),</div>
+            <div style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>
+              Private stops <span style={CODE}>ref()</span>,
+            </div>
             <div style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, queriesAt, 12) }}>not queries</div>
           </Ink>
           <Ink at={removesAt} dur={14} style={{ left: ASST_X, top: asstTop + modelH + h(20) }}>
@@ -275,11 +278,24 @@ export const ReadyScene: React.FC = () => {
         <Ink at={inputAt} dur={14} style={{ left: R_X, top }}>
           <div style={{ ...line(26, INK), fontWeight: 500 }}>Documentation is an input</div>
         </Ink>
-        <Flow points={[[desc.x1 + 14, desc.mid], [R_X - 14, desc.mid]]} at={letterAt - 10} color={INK_SOFT} head={11} width={2} />
-        <Ink at={letterAt - 6} dur={12} style={{ left: R_X, top: desc.mid - h(64) }}>
+        {/* The input, drawn while it is named: the description as written
+            gives the governed 440.00. The strike retires that value, and the
+            cut description's arrives on its words. */}
+        <Flow points={[[desc.x1 + 14, desc.mid], [R_X - 14, desc.mid]]} at={inputAt + 8} color={INK_SOFT} head={11} width={2} />
+        <Ink at={inputAt + 12} dur={12} style={{ left: R_X, top: desc.mid - h(64) }}>
           <span style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap" }}>Net revenue, in SQL written from the description</span>
         </Ink>
-        <Swap at={reportsAt} left={R_X} top={desc.mid - 22} from={READY.asWritten.toFixed(2)} to={READY.withoutCut.toFixed(2)} fromColor={OK_INK} toColor={ACCENT_INK} showAt={letterAt} />
+        <Swap
+          showAt={inputAt + 18}
+          cutAt={dropAt + 8}
+          at={reportsAt}
+          left={R_X}
+          top={desc.mid - 22}
+          from={READY.asWritten.toFixed(2)}
+          to={READY.withoutCut.toFixed(2)}
+          fromColor={OK_INK}
+          toColor={ACCENT_INK}
+        />
         <Ink at={reviewAt - 4} dur={16} style={{ left: R_X, top: desc.mid + h(118) }}>
           <span style={{ ...line(30, INK), fontWeight: 500 }}>
             <Mark at={reviewAt + 4}>Review descriptions like code</Mark>
@@ -290,9 +306,13 @@ export const ReadyScene: React.FC = () => {
   );
 };
 
-/** A value that shows from `showAt`, then gives way to another on `at`. */
-const Swap: React.FC<{ at: number; showAt: number; left: number; top: number; from: string; to: string; fromColor: string; toColor: string }> = ({
+/** A value that shows from `showAt`; on `cutAt` it steps down into a soft
+ *  "As written" line and its slot waits empty, until another arrives on
+ *  `at`. (The slot is never filled by the old value beside the edited
+ *  input: review 2026-11-26.) */
+const Swap: React.FC<{ at: number; cutAt: number; showAt: number; left: number; top: number; from: string; to: string; fromColor: string; toColor: string }> = ({
   at,
+  cutAt,
   showAt,
   left,
   top,
@@ -303,14 +323,15 @@ const Swap: React.FC<{ at: number; showAt: number; left: number; top: number; fr
 }) => {
   const frame = useCurrentFrame();
   const shown = ease(frame, showAt, 12);
+  const c = ease(frame, cutAt, 12);
   const k = ease(frame, at, 12);
   if (shown <= 0) return null;
   const style: React.CSSProperties = { ...note(40, fromColor), fontWeight: 500, position: "absolute", left: 0, top: 0, whiteSpace: "nowrap" };
   return (
     <div style={{ position: "absolute", left, top, opacity: shown }}>
-      <span style={{ ...style, opacity: 1 - k, transform: `translateY(${-k * 14}px)` }}>{from}</span>
-      <span style={{ ...style, color: toColor, opacity: k, transform: `translateY(${(1 - k) * 14}px)` }}>{to}</span>
-      <span style={{ ...note(23, INK_SOFT), position: "absolute", left: 0, top: 62, whiteSpace: "nowrap", opacity: ease(frame, at + 16, 12) }}>As written, {from}</span>
+      <span style={{ ...style, opacity: 1 - c, transform: `translateY(${c * 14}px)` }}>{from}</span>
+      <span style={{ ...style, color: toColor, opacity: k, transform: `translateY(${(1 - k) * -14}px)` }}>{to}</span>
+      <span style={{ ...note(23, INK_SOFT), position: "absolute", left: 0, top: 62, whiteSpace: "nowrap", opacity: ease(frame, cutAt + 6, 12) }}>As written, {from}</span>
     </div>
   );
 };

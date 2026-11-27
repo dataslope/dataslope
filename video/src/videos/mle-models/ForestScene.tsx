@@ -128,7 +128,7 @@ export const ForestScene: React.FC = () => {
             Bagged {pct(ENSEMBLE.bagged, 1)}
           </Line>
           <Line at={seventyAt - 2} x={X0} y={y(760)} size={26}>
-            Single trees: <span style={{ color: OK_INK }}>forest {pct(ENSEMBLE.forestSingle)}</span>,{" "}
+            Single trees, on average: <span style={{ color: OK_INK }}>forest {pct(ENSEMBLE.forestSingle)}</span>,{" "}
             <span style={{ color: DATA }}>bagged {pct(ENSEMBLE.baggedSingle)}</span>
           </Line>
           <Line at={overlapAt - 2} x={X0} y={y(812)} size={26}>

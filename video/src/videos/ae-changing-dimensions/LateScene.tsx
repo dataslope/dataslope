@@ -25,8 +25,9 @@ const withMoney = (t: { cols: string[]; rows: string[][] }, col = "amount") => (
 
 /**
  * Question 5, on de-modeling-history's three staged orders against this
- * page's rows for customers 42 and 99: order 203 is for customer 77, who is
- * not in the dimension yet. The inner-join lookup loads two rows (700.00 of
+ * page's rows for customers 42 and 99, drawn as the current rows the lookup
+ * reads (42's East version is in the table too, so every lookup says
+ * is_current): order 203 is for customer 77, who is not in the dimension yet. The inner-join lookup loads two rows (700.00 of
  * 1,110.00, no error). The page's fix: the unknown member, -1, with the
  * customer's own ID kept on the fact, so all 1,110.00 load and the report
  * shows Unknown 410.00; when 77 lands, the correction job re-keys the one
@@ -144,8 +145,11 @@ export const LateScene: React.FC = () => {
             { row: 2, col: S.cols.indexOf("customer_id"), at: vanishAt + 2, out: neverAt, color: MARK_BAD },
           ]}
         />
+        {/* Its current rows: 42 also has its East version (1001), as
+            Question 2 drew it, which is why every lookup below says
+            is_current (review 2026-11-26). */}
         <TableName g={gd} at={beforeAt - 6}>
-          dim_customer
+          dim_customer, current rows
         </TableName>
         <DataTable
           g={gd}

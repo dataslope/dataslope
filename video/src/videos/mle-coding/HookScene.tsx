@@ -8,7 +8,7 @@ import { ds } from "../../theme/brand";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { VECTOR } from "./data";
-import { ART, Arrow, artBox, BAR, BLUE_INK, Drift, Fade, Headline, INK, INK_SOFT, int, Kicker, Line, Listing, listingHeight, Mark, MARK_BAD, seeded, Spot, X0 } from "./parts";
+import { ART, Arrow, artBox, BAR, BLUE_INK, Drift, Fade, Headline, INK, INK_SOFT, int, Kicker, Line, lineOf, Listing, listingHeight, Mark, MARK_BAD, seeded, Spot, X0 } from "./parts";
 
 /** The column of items: a few rows stand for the hundred thousand. */
 const ROWS = 40;
@@ -166,7 +166,18 @@ export const HookScene: React.FC = () => {
         </Line>
 
         {/* ── A few lines of NumPy, and what the round asks of them ── */}
-        <Listing lines={LINES} x={1050} top={listTop} size={24} at={linesAt} lineAt={LINES.map((_, i) => linesAt + 2 + i * 5)} />
+        {/* "where they break": the first line divides by a norm that is
+            zero for an all-zero row, the guard question 2 says people
+            forget (review 2026-11-26). */}
+        <Listing
+          lines={LINES}
+          x={1050}
+          top={listTop}
+          size={24}
+          at={linesAt}
+          lineAt={LINES.map((_, i) => linesAt + 2 + i * 5)}
+          marks={[{ line: lineOf(LINES, "np.linalg.norm(E"), at: breakAt + 4, color: MARK_BAD }]}
+        />
         <Line at={costAt - 2} x={1050} y={listBottom + h(28)} size={25}>
           What they <Mark at={costAt + 4}>cost</Mark>, and where they <Mark at={breakAt} color={MARK_BAD}>break</Mark>
         </Line>

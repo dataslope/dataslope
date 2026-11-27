@@ -86,8 +86,9 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     it on "block regressions".
  *   q1-online: rung 5, "Online: A/B on user outcomes", with three guardrail
  *     chips, latency, cost, refusal rate.
- *   q1-agree: a short arrow between rung 1 and rung 5, "wins offline, loses
- *     online" in red, and "Fix the eval set" in green.
+ *   q1-agree, q1-agree-fix: a short arrow between rung 1 and rung 5, "wins
+ *     offline, loses online" in red, "Guardrails held" in grey under it on
+ *     its words, and "Fix the eval set" in green.
  *   q1-bench: a "Public benchmarks" chip set apart from the ladder, in grey,
  *     with "saturated" and "may have leaked into training" under it.
  *   q2: question card; the balance-scale spot. q2-bias: three rows lit as
@@ -112,7 +113,8 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     to 10", "A judge from another model family".
  *   q2-cal: "Calibrate against experts: chance-corrected agreement (Cohen's
  *     kappa)", and under it "Worked through on the Data Scientist track" in
- *     grey.
+ *     grey. q2-bar: "The bar: judge–expert agreement ≈ expert–expert
+ *     agreement" under that.
  *   q2-again: the judge chip relabelled "new model / new rubric" with a
  *     yellow "recalibrate".
  *   q3: question card; the assistant split into two outlined halves,
@@ -145,8 +147,9 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *   q4-design: four chips around the loop, inked on their words: "step and
  *     cost budget", "timeouts and retries", "permissions scoped to the
  *     user", "a trace of every step".
- *   q4-idem: "file ticket" called twice by a retry; one ticket results,
- *     green, "Idempotent".
+ *   q4-idem, q4-idem-key: "Idempotent tools", then `file_ticket(key="7f3")`
+ *     on "an idempotency key" and the same call again as a retry; one
+ *     ticket results, green.
  *   q4-inject: the loop's result box lit as what a tool brings back; a
  *     retrieved page's injected instruction in red, "Untrusted input"; and
  *     "No damaging tool without a confirmation" in green.
@@ -217,7 +220,10 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     ("saturated", "may have leaked into training data"): the page. "The
  *     layers have to agree" is the page's own question-zero item
  *     ("connecting offline scores to online outcomes") stated as the check
- *     an interviewer asks next; the fix is the video's reasoning.
+ *     an interviewer asks next; the fix is the video's reasoning, and so is
+ *     its condition ("and the guardrails held": a change can lose online on
+ *     latency or cost, the guardrails q1-online names, while the eval set
+ *     measured quality correctly).
  *   - q1-ours: the page's scoring rule (exact match for structured output,
  *     a rubric judge for open-ended text) applied to the assistant's two
  *     outputs.
@@ -231,7 +237,11 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     − 35 = 35% of pairs changed verdict with the order (a lower bound:
  *     the share whose verdict differs is at least the difference of the two
  *     rates). That a changed judge model or rubric needs calibrating again
- *     follows from calibrating "before you rely on its scores".
+ *     follows from calibrating "before you rely on its scores". The bar in
+ *     q2-bar (agreement with the experts about as high as theirs with each
+ *     other) is Zheng et al.'s own test, the paper the page cites: GPT-4's
+ *     agreement with human judges matched the humans' agreement with each
+ *     other.
  *   - q3: the halves, recall@k, MRR, faithfulness, answer relevance,
  *     citation accuracy, "If retrieval misses, no prompt fixes it", Liu et
  *     al.'s finding and "a reranker earns its latency": the page. The
@@ -248,7 +258,8 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     hold damaging tools unconfirmed), and 0.95^10 ≈ 60%: the page. Arithmetic on the page's
  *     formula: 0.95^10 = 0.599, 0.99^10 = 0.904 ("ninety"), 0.95^5 = 0.774
  *     ("seventy-seven"). Filing one ticket twice is the video's example of
- *     an idempotent tool.
+ *     an idempotent tool, and the idempotency key (a client-chosen id the
+ *     tool deduplicates on) is how a tool is made one.
  *   - q5: outcomes ("did the ticket get filed, do the tests pass, is the
  *     database in the expected state?"), trajectories, repeating each task,
  *     τ-bench's pass@k and pass^k, "a customer-facing agent needs the
@@ -337,9 +348,10 @@ export const script: NarrationScript = {
       text: "Fifth, online: A B tests on user outcomes, with guardrails on latency, cost and refusal rate.",
       pauseAfter: 0.7,
     },
+    { id: "q1-agree", text: "The layers have to agree." },
     {
-      id: "q1-agree",
-      text: "The layers have to agree. When a change wins offline and loses online, fix the eval set: it's measuring something users don't care about.",
+      id: "q1-agree-fix",
+      text: "When a change wins offline and loses online, and the guardrails held, fix the eval set: it's measuring something users don't care about.",
       pauseAfter: 0.6,
     },
     {
@@ -369,7 +381,7 @@ export const script: NarrationScript = {
     {
       id: "q2-read",
       text: "The answers didn't change, only their order. Whichever goes first wins about two thirds of the time, and at least thirty-five percent of the verdicts flipped with the order.",
-      pauseAfter: 0.8,
+      pauseAfter: 1.3,
     },
     {
       id: "q2-fix",
@@ -379,6 +391,11 @@ export const script: NarrationScript = {
     {
       id: "q2-cal",
       text: "Then calibrate it against people. Experts label a sample, and you report the judge's agreement with them, corrected for chance with Cohen's kappa, before you rely on its scores.",
+      pauseAfter: 0.6,
+    },
+    {
+      id: "q2-bar",
+      text: "The bar: it should agree with the experts about as well as they agree with each other.",
       pauseAfter: 0.6,
     },
     {
@@ -413,7 +430,7 @@ export const script: NarrationScript = {
     {
       id: "q3-faith",
       text: "Faithfulness is judged against the passages, not against the truth. So a right answer the passages don't support still fails, because it's one you can't check.",
-      pauseAfter: 0.7,
+      pauseAfter: 1.3,
     },
     {
       id: "q3-follow",
@@ -444,9 +461,10 @@ export const script: NarrationScript = {
       text: "Interviewers listen for the design around the loop: a budget on steps and cost, timeouts and retries for each tool, permissions scoped to the user, and a trace of every step.",
       pauseAfter: 0.6,
     },
+    { id: "q4-idem", text: "And idempotent tools, since a retried step can run twice." },
     {
-      id: "q4-idem",
-      text: "And idempotent tools, since a retried step can run twice. Filing the same ticket twice should still leave one ticket.",
+      id: "q4-idem-key",
+      text: "Give each call an idempotency key, so filing the same ticket twice still leaves one ticket.",
       pauseAfter: 0.6,
     },
     {
@@ -481,7 +499,7 @@ export const script: NarrationScript = {
     {
       id: "q5-traj",
       text: "Then inspect the trajectory: the right tool, valid arguments, the number of steps, the cost. An outcome check alone would pass an agent that got there by a path you'd never allow.",
-      pauseAfter: 0.7,
+      pauseAfter: 1.6,
     },
     {
       id: "q5-repeat",

@@ -30,7 +30,6 @@ import {
   SERIES2,
   SERIES2_INK,
   Spot,
-  Strike,
   Svg,
   X0,
 } from "./parts";
@@ -204,10 +203,13 @@ const Metrics: React.FC = () => {
             </span>
           </Say>
         ))}
+        {/* Not struck: on its own training data, least squares' R² is the
+            share of variance explained. The page's caution is where that
+            reading stops, which is what lets it go negative on new data. */}
         <Say at={shareAt - 4} x={R_X + 40} y={y(740)}>
-          <span style={line(30, INK_SOFT, 400)}>
-            <Strike at={shareAt + 6}>A share of variance explained</Strike>
-            <span style={{ opacity: ease(frame, shareAt + 12, 10), color: ACCENT_INK }}> out of sample</span>
+          <span style={line(30, INK, 400)}>
+            A share of variance explained
+            <span style={{ opacity: ease(frame, shareAt + 12, 10), color: ACCENT_INK }}>: only in sample, for least squares</span>
           </span>
         </Say>
       </Fade>

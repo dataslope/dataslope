@@ -59,8 +59,13 @@ const Truth: React.FC<{ c: Ctx }> = ({ c }) => {
   ];
   return (
     <>
+      {/* The heading follows the boxes (2026-11-26 review): once every tool
+          reads the layer's revenue it no longer says "without one". */}
       <Line at={withoutAt} top={top}>
-        Without one, each tool writes its own revenue
+        <span style={{ display: "inline-grid" }}>
+          <span style={{ gridArea: "1 / 1", opacity: 1 - off, whiteSpace: "nowrap" }}>Without one, each tool writes its own revenue</span>
+          <span style={{ gridArea: "1 / 1", opacity: on, whiteSpace: "nowrap" }}>With one, every tool asks the layer</span>
+        </span>
       </Line>
       {tools.map((t, i) => (
         <Node
@@ -458,46 +463,66 @@ const Governance: React.FC<{ c: Ctx }> = ({ c }) => {
 
 const Cumulative: React.FC<{ c: Ctx }> = ({ c }) => {
   const frame = useCurrentFrame();
-  const trailingAt = c.w("r-cumulative", "It aggregates over a trailing window");
-  const rollingAt = c.w("r-cumulative", "rolling twenty-eight-day active users");
-  const mtdAt = c.w("r-cumulative", "month-to-date revenue");
-  const subtlyAt = c.w("r-cumulative", "easy to get subtly different by hand");
-  const onceAt = c.w("r-cumulative", "define the grain and the window once");
+  // Two kinds of window, both ending today (2026-11-26 review): a trailing
+  // one that slides along the days, and a to-date one that starts on the 1st
+  // and grows. Month-to-date is the second kind, not a trailing window.
+  const windowAt = c.w("r-cumulative-window", "It aggregates over a window");
+  const trailingAt = c.w("r-cumulative-window", "a trailing one");
+  const rollingAt = c.w("r-cumulative-window", "rolling twenty-eight-day active users");
+  const startAt = c.w("r-cumulative-window", "one from the start of the month");
+  const mtdAt = c.w("r-cumulative-window", "month-to-date revenue");
+  const subtlyAt = c.w("r-cumulative-once", "easy to get subtly different by hand");
+  const onceAt = c.w("r-cumulative-once", "define the grain and the window once");
   const top = c.y(BODY_Y);
   const axisY = top + c.h(170);
   const DAYS = 60;
+  /** The 1st of the month, fourteen days before today (the axis's end). */
+  const FIRST = 46;
   const px = 960 / DAYS;
-  const slide = ease(frame, rollingAt, 150);
+  const slide = ease(frame, trailingAt, 150);
   const start = Math.round(slide * (DAYS - 28));
   const winX = R_X + start * px;
+  const toDateX = R_X + FIRST * px;
+  const toDateH = c.h(40);
+  const grow = ease(frame, startAt, 18);
   return (
     <>
-      <Line at={trailingAt} top={top}>
-        A trailing window, not a single period
+      <Line at={windowAt} top={top}>
+        A window, not a single period
       </Line>
-      <Svg opacity={ease(frame, trailingAt + 4, 12)}>
-        <rect x={winX} y={axisY - c.h(46)} width={28 * px} height={c.h(46)} fill={HIGHLIGHT} opacity={ease(frame, rollingAt, 10)} />
+      <Svg opacity={ease(frame, windowAt + 4, 12)}>
+        <rect x={winX} y={axisY - c.h(46)} width={28 * px} height={c.h(46)} fill={HIGHLIGHT} opacity={ease(frame, trailingAt, 10)} />
+        <rect x={toDateX} y={axisY + 3} width={(DAYS - FIRST) * px * grow} height={toDateH} fill={HIGHLIGHT} opacity={ease(frame, startAt, 8)} />
         <line x1={R_X} y1={axisY} x2={R_X + 960} y2={axisY} stroke={INK} strokeWidth={1.5} />
         {Array.from({ length: DAYS + 1 }, (_, i) => (
           <line key={i} x1={R_X + i * px} y1={axisY} x2={R_X + i * px} y2={axisY - (i % 7 === 0 ? 14 : 7)} stroke={INK_SOFT} strokeWidth={1.2} />
         ))}
-        <text x={winX + 14 * px} y={axisY - c.h(58)} textAnchor="middle" style={svgText(label(21, INK))} opacity={ease(frame, rollingAt + 4, 10)}>
-          28 days
+        <text x={winX + 14 * px} y={axisY - c.h(58)} textAnchor="middle" style={svgText(label(21, INK))} opacity={ease(frame, trailingAt + 4, 10)}>
+          trailing 28 days
         </text>
-        <text x={R_X + 960} y={axisY + 30} textAnchor="end" style={svgText(note(20, INK_SOFT))}>
-          day
+        {/* The 1st: a tick down from the axis (clear of the trailing band
+            above it), named under the band's left edge. */}
+        <line x1={toDateX} y1={axisY} x2={toDateX} y2={axisY + toDateH + 8} stroke={INK} strokeWidth={1.5} opacity={ease(frame, startAt, 8)} />
+        <text x={toDateX} y={axisY + toDateH + 34} textAnchor="middle" style={svgText(note(20, INK_SOFT))} opacity={ease(frame, startAt + 4, 10)}>
+          the 1st
+        </text>
+        <text x={toDateX + ((DAYS - FIRST) * px) / 2} y={axisY + 3 + toDateH / 2 + 7} textAnchor="middle" style={svgText(label(21, INK))} opacity={ease(frame, mtdAt, 10)}>
+          month to date
+        </text>
+        <text x={R_X + 960 + 12} y={axisY + 7} textAnchor="start" style={svgText(note(20, INK_SOFT))}>
+          today
         </text>
       </Svg>
-      <Line at={rollingAt} top={axisY + c.h(50)} color={BLUE_INK}>
+      <Line at={rollingAt} top={axisY + c.h(100)} color={BLUE_INK}>
         rolling 28-day active users
       </Line>
-      <Line at={mtdAt} top={axisY + c.h(92)} color={BLUE_INK}>
+      <Line at={mtdAt} top={axisY + c.h(142)} color={BLUE_INK}>
         month-to-date revenue
       </Line>
-      <Line at={subtlyAt} top={axisY + c.h(146)} color={INK_SOFT} size={22}>
+      <Line at={subtlyAt} top={axisY + c.h(196)} color={INK_SOFT} size={22}>
         Easy to get subtly different by hand
       </Line>
-      <Line at={onceAt} top={axisY + c.h(188)} color={OK_INK} bold>
+      <Line at={onceAt} top={axisY + c.h(238)} color={OK_INK} bold>
         Define the grain and the window once
       </Line>
     </>
@@ -581,7 +606,11 @@ export const RapidScene: React.FC = () => {
   const nextAt = n.word("next", "Next:");
 
   const items: RapidItem[] = [
-    { n: 9, label: "Why one source of truth?", at: n.word("r-truth", "Why does a single source of truth"), body: <Truth c={c} /> },
+    // Lit on "source of truth" rather than "Why does" (2026-11-26 review), with
+    // the list built on "Question nine": the question is read over a page that
+    // has nothing else to move until "Without one", and check:motion found it
+    // still for 3 s.
+    { n: 9, label: "Why one source of truth?", at: n.word("r-truth", "source of truth for metrics"), body: <Truth c={c} /> },
     { n: 10, label: "Metric drift, and preventing it", at: n.word("r-drift", "What is metric drift"), body: <Drifting c={c} /> },
     { n: 11, label: "The dbt Semantic Layer, MetricFlow", at: n.word("r-metricflow", "What is the dbt Semantic Layer"), body: <MetricFlow c={c} askedAt={n.word("r-metricflow", "or MetricFlow")} /> },
     { n: 12, label: "LookML and Looker", at: n.word("r-lookml", "What is LookML"), body: <LookMl c={c} /> },
@@ -607,7 +636,7 @@ export const RapidScene: React.FC = () => {
       <Drift from={from} to={n.beat("next").to + 40}>
         <Kicker at={tenAt - 4}>Quick round</Kicker>
         <Headline lead="Eleven quick ones" turn="to finish." at={tenAt - 2} turnAt={finishAt} size={64} />
-        <RapidFire items={items} x={X0} top={y(LIST_TOP)} rowH={h(ROW)} width={620} at={tenAt + 6} end={end} />
+        <RapidFire items={items} x={X0} top={y(LIST_TOP)} rowH={h(ROW)} width={620} at={n.word("r-truth", "Question nine") - 4} end={end} />
 
         {/* ── The bridge ── */}
         <Note at={peopleAt} x={R_X} y={y(BODY_Y)}>

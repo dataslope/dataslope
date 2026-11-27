@@ -147,7 +147,15 @@ export const SoftmaxScene: React.FC = () => {
         <Line at={logSoftAt} x={R_X} y={y(612) + h(100)} size={24} color={OK_INK} weight={600}>
           Log-softmax: {minus(SOFTMAX.logSoftmax[1])}, computed directly
         </Line>
-        <Line at={rawAt} x={R_X} y={y(612) + h(166)} size={26} weight={600}>
+        {/* How: the same shift, inside the log, so nothing is exponentiated
+            before the log is taken (review 2026-11-26). */}
+        <Line at={logSoftAt + 12} x={R_X} y={y(612) + h(150)} size={26} color={INK_SOFT}>
+          <M>{"log p = (z - max) - log Σ e^{z - max}"}</M>
+        </Line>
+        <Line at={logSoftAt + 24} x={R_X} y={y(612) + h(196)} size={26} color={INK_SOFT}>
+          <M>{`${SOFTMAX.z2[1]} - ${SOFTMAX.z2[0]} - log(e^{0} + e^{${SOFTMAX.z2[1] - SOFTMAX.z2[0]}}) = ${SOFTMAX.logSoftmax[1]}`}</M>
+        </Line>
+        <Line at={rawAt} x={R_X} y={y(612) + h(256)} size={26} weight={600}>
           A loss should take the raw scores
         </Line>
       </Drift>

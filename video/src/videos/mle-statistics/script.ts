@@ -127,7 +127,9 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     and the tails beyond it shaded, "p = 0.024".
  *   q8-models: the two models' 4,000 answers pooled and shuffled; the null
  *     histogram (PERM_MODELS.unpairedNull) wide, the 0.5-point gap in the
- *     middle of it, "p = 0.62".
+ *     middle of it, "p = 0.62: no evidence of a gap" (never "nothing there":
+ *     a large p is no evidence of a difference, not evidence of none, which
+ *     is q9-null's point).
  *   q8-paired: a 2×2 table of agreement: both right 1,806, both wrong 176,
  *     only old 4, only new 14, the two off-diagonal cells lit yellow; the
  *     paired null (PERM_MODELS.pairedNull, a narrow spike train) with the
@@ -135,6 +137,9 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     null" (one line, not a new one: the page is full); "Same gap,
  *     different test". Not "it's real": that is the p-value's own
  *     misreading, which "q6-not" has just ruled out.
+ *   q8-ship: the hook's "Ship it?" answered over the finished page, "reject
+ *     the null" marked on "passes": offline it passes, and an online test
+ *     (q9-online) decides.
  *   q9: question card; the page's two-worlds picture: the null and
  *     alternative curves, a critical line, α (red tail) and β (red area
  *     under the alternative), power (green area).
@@ -158,12 +163,15 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *   q11: question card; a likelihood curve over a click rate, its peak
  *     marked "maximum likelihood" (MLE.grid, MLE.curveSmoothed).
  *   q11-log: "0.5 × 0.5 × … (2,000 times) = 0.0" in red; "log: −1,386.29"
- *     in green.
+ *     in green. q11-log-peak: "The log only ever rises, so the peak stays
+ *     put", the follow-up an interviewer asks.
  *   q11-loss: two lines: "Normal likelihood → squared error",
  *     "Bernoulli likelihood → log loss", each lit as said.
  *   q11-small: the likelihood for 3 clicks in 3 views (MLE.curve33) piling
  *     against 100%, red; the smoothed curve (4 in 5) peaking at 80%, green;
- *     "L2 = a normal prior on the weights" under it.
+ *     "L2 = a normal prior on the weights" under it. The heading turns to
+ *     "Likelihood by click rate" and the "Maximum likelihood" tag leaves, so
+ *     the prior's 80% is never labelled the maximum likelihood.
  *   q12: question card; the formula in words: posterior = likelihood ×
  *     prior / evidence. The credit card spot.
  *   q12-fraud: the page's base-rate grid, redrawn as fraud: 1,098 dots, one
@@ -187,7 +195,8 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     scatter, "r = 0".
  *   r-cause: three outlined boxes, "Hot weather" with arrows to "Ice cream
  *     sales" and "Drownings", the arrow between those two dashed and
- *     struck; the ice cream spot beside the first box.
+ *     struck; the ice cream spot beside the first box. r-cause-other: "Or
+ *     reverse causation, or chance", the page's other two reasons.
  *   next: <NextLine> "Next: deep learning" on "deep learning".
  *
  * Every animation in the scenes is cued to a word below, so edit freely: a
@@ -338,7 +347,7 @@ export const script: NarrationScript = {
     {
       id: "q2-limit",
       text: "It covers means and sums, so accuracy and average loss. For a median, or a ninety-fifth percentile latency, there's no such formula.",
-      pauseAfter: 0.6,
+      pauseAfter: 1.2,
     },
     {
       id: "q3",
@@ -392,7 +401,7 @@ export const script: NarrationScript = {
     {
       id: "q6-not",
       text: "[slowly] Because it assumes the null, it can't be the probability that the null is true, or that your result is a fluke.",
-      pauseAfter: 0.7,
+      pauseAfter: 1.2,
     },
     {
       id: "q7",
@@ -414,12 +423,17 @@ export const script: NarrationScript = {
     },
     {
       id: "q8-models",
-      text: "Now the two models. Pool their four thousand right-or-wrong answers and shuffle, and p is point six two. Nothing there.",
+      text: "Now the two models. Pool their four thousand right-or-wrong answers and shuffle, and p is point six two.",
       pauseAfter: 0.6,
     },
     {
       id: "q8-paired",
       text: "But they answered the same two thousand examples, and disagree on only eighteen, of which the new model wins fourteen. Shuffle within each pair instead, swapping which model gave which answer, and p is point oh three. Same gap, but the paired test uses how the data was collected, and at five percent it rejects the null.",
+      pauseAfter: 0.7,
+    },
+    {
+      id: "q8-ship",
+      text: "So, ship it? Offline, the new model passes; an online test gets the final say.",
       pauseAfter: 0.8,
     },
 
@@ -478,7 +492,17 @@ export const script: NarrationScript = {
     },
     {
       id: "q11-log",
-      text: "You maximize the log of the likelihood, because the product underflows. Give each of two thousand labels a probability of one half, and float sixty-four rounds their product to exactly zero. Its log is just minus thirteen hundred and eighty-six.",
+      text: "You maximize the log of the likelihood, because the product underflows.",
+      pauseAfter: 0.55,
+    },
+    {
+      id: "q11-log-peak",
+      text: "The log only ever rises, so the peak stays put.",
+      pauseAfter: 0.5,
+    },
+    {
+      id: "q11-log-zero",
+      text: "Give each of two thousand labels a probability of one half, and float sixty-four rounds their product to exactly zero. Its log is just minus thirteen hundred and eighty-six.",
       pauseAfter: 0.6,
     },
     {
@@ -539,7 +563,17 @@ export const script: NarrationScript = {
     },
     {
       id: "r-cause",
-      text: "And correlation isn't causation: a confounder can drive both, as hot weather drives ice cream sales and drownings. A model can predict from a correlation. Deciding what to change needs a randomized experiment, or a causal method that rules confounders out.",
+      text: "And correlation isn't causation: a confounder can drive both, as hot weather drives ice cream sales and drownings.",
+      pauseAfter: 0.55,
+    },
+    {
+      id: "r-cause-other",
+      text: "Or the cause runs the other way, or it's chance.",
+      pauseAfter: 0.5,
+    },
+    {
+      id: "r-cause-act",
+      text: "A model can predict from a correlation. Deciding what to change needs a randomized experiment, or a causal method that rules confounders out.",
       pauseAfter: 0.9,
     },
     {

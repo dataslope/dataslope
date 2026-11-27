@@ -191,7 +191,7 @@ export const CltScene: React.FC = () => {
           </Ink>
           <Ink at={medianAt} dur={14} style={{ left: X0, top: y(866), whiteSpace: "nowrap" }}>
             <div style={{ display: "flex", alignItems: "center", gap: 14, fontSize: 24, ...note(24, INK) }}>
-              <span style={{ width: 210 }}>No formula</span>
+              <span style={{ width: 210 }}>No simple formula</span>
               <OutlineBadge tone="yellow">median</OutlineBadge>
               <span style={{ opacity: ease(frame, p95At - 2, 10) }}>
                 <OutlineBadge tone="yellow">p95 latency</OutlineBadge>

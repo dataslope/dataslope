@@ -215,9 +215,13 @@ export const SemScene: React.FC = () => {
                       { text: "?", at: questionAt + 6, out: activeAt },
                       { text: "active_users", at: activeAt, mono: true },
                     ]
-                  : i === 3
-                    ? [{ text: "last week", at: weekAt }]
-                    : []
+                  : i === 2
+                    ? // "Last week" is a range on time, so a filter; the
+                      // grain it is counted at is the week.
+                      [{ text: "last week", at: weekAt }]
+                    : i === 3
+                      ? [{ text: "week", at: weekAt + 6 }]
+                      : []
               }
             />
           </React.Fragment>

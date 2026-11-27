@@ -136,14 +136,15 @@ export const TestScene: React.FC = () => {
         </Line>
         <Line at={parityAt + 2} x={X0} y={y(356)} size={22} color={INK_SOFT}>
           <Users size={21} strokeWidth={2.2} color={INK_SOFT} style={{ verticalAlign: "-0.15em", marginRight: 8 }} />
-          users <Mark at={onlyAt}>only</Mark> see the champion&apos;s
+          users <Mark at={onlyAt}>only</Mark> see the current model&apos;s
         </Line>
         <List x={X0} y={listTop} rowH={rowH} at={parityAt + 4} color={SHOWN} />
         <Line at={parityAt + 8} x={X0 + 450} y={y(356)} size={22} color={INK_SOFT}>
           <ScrollText size={21} strokeWidth={2.2} color={INK_SOFT} style={{ verticalAlign: "-0.15em", marginRight: 8 }} />
-          the challenger&apos;s, to a log
+          the new model&apos;s, to a log
         </Line>
-        {/* The challenger's pick nobody saw: lit while it is named. */}
+        {/* The new model's pick nobody saw: lit while it is named. The names
+            champion and challenger wait for q12-champ, which defines them. */}
         <div
           style={{
             position: "absolute",
@@ -181,12 +182,12 @@ export const TestScene: React.FC = () => {
         </Line>
         <Line at={realAt - 2} x={PANEL_B} y={y(356)} size={22} color={INK_SOFT}>
           <Users size={21} strokeWidth={2.2} color={INK_SOFT} style={{ verticalAlign: "-0.15em", marginRight: 8 }} />
-          half the users: champion
+          half the users: current
         </Line>
         <List x={PANEL_B} y={listTop} rowH={rowH} at={realAt} color={SHOWN} clicks={[0, 2]} clickAt={clickAt} />
         <Line at={realAt + 6} x={PANEL_B + 340} y={y(356)} size={22} color={INK_SOFT}>
           <Users size={21} strokeWidth={2.2} color={INK_SOFT} style={{ verticalAlign: "-0.15em", marginRight: 8 }} />
-          half: challenger
+          half: new
         </Line>
         <List x={PANEL_B + 340} y={listTop} rowH={rowH} at={realAt + 6} color={SHOWN} clicks={[1]} clickAt={clickAt + 6} />
         <Line at={metricsAt - 2} x={PANEL_B} y={listsBottom + h(34)} size={22} color={INK}>

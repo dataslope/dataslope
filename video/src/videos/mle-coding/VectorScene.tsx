@@ -60,11 +60,11 @@ export const VectorScene: React.FC = () => {
   const bufferAt = n.word("q1-why", "contiguous, typed buffer");
   const severalAt = n.word("q1-why", "several numbers at once");
   const perRowAt = n.word("q1-row", "calling NumPy once per row");
-  const thirtyAt = n.word("q1-row", "roughly thirty times slower");
-  const interpAt = n.word("q1-row", "the interpreter still runs once per row");
-  const oneOpAt = n.word("q1-row", "Put the whole step in one array operation");
-  const loopsAt = n.word("q1-row", "keep loops for steps that depend on the step before");
-  const end = n.beat("q1-row").to;
+  const fortyAt = n.word("q1-row-ratio", "roughly forty times slower");
+  const interpAt = n.word("q1-row-ratio", "the interpreter still runs once per row");
+  const oneOpAt = n.word("q1-row-rule", "Put the whole step in one array operation");
+  const loopsAt = n.word("q1-row-rule", "keep loops for steps that depend on the step before");
+  const end = n.beat("q1-row-rule").to;
 
   const barsTop = y(318);
   const rowH = h(62);
@@ -98,7 +98,7 @@ export const VectorScene: React.FC = () => {
       <Sfx name="el-whoosh" at={callAt + 2} level={-36} />
       <Sfx name="el-tap" at={severalAt} level={-33} />
       <Sfx name="el-pop" at={perRowAt + 4} level={-31} />
-      <Sfx name="el-tap" at={thirtyAt + 4} level={-30} />
+      <Sfx name="el-tap" at={fortyAt + 4} level={-30} />
       <Sfx name="el-chime" at={loopsAt} level={-33} />
 
       <Drift from={from} to={end + 40}>
@@ -141,9 +141,9 @@ export const VectorScene: React.FC = () => {
               at: perRowAt + 4,
               dur: 24,
               litAt: perRowAt,
-              endAt: thirtyAt,
+              endAt: fortyAt,
               end: (
-                <Mark at={thirtyAt + 4}>
+                <Mark at={fortyAt + 4}>
                   <span style={{ ...note(26, INK), fontWeight: 600 }}>{ratio(VECTOR.ratio.perRow)}</span>
                 </Mark>
               ),

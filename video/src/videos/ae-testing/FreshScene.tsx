@@ -150,14 +150,17 @@ export const FreshScene: React.FC = () => {
         <Spot art="clock" at={clockAt + 4} left={CLOCK.x} top={colsTop - h(16)} width={CLOCK.w} />
 
         {/* ── The raw rows' load times: freshness reads the newest ── */}
-        <TableName g={rawG} at={loadedAt - 4} out={newestAt - 10}>
+        {/* The rows arrive with "how old the newest row is", so the definition
+            is spoken over what it describes; the band and its note wait for
+            the column the age is read from. */}
+        <TableName g={rawG} at={oldAt - 4} out={newestAt - 10}>
           <SmallMono>raw.orders</SmallMono>
         </TableName>
         <DataTable
           g={rawG}
           cols={[{ name: "order_id", numeric: true }, { name: "_loaded_at" }]}
-          rows={rawRows.map((cells, i) => ({ cells, at: loadedAt + i * 3 }))}
-          at={loadedAt - 4}
+          rows={rawRows.map((cells, i) => ({ cells, at: oldAt + i * 3 }))}
+          at={oldAt - 4}
           bands={[{ row: newestRow, at: loadedAt + 18, color: MARK }]}
           out={newestAt - 10}
         />

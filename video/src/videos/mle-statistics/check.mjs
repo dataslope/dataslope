@@ -190,7 +190,7 @@ for i in range(10000):
 d = new - old
 flips = rm.choice([-1, 1], size=(10000, N))
 pa_ = (flips * d).mean(1)
-uh, ue = np.histogram(un, bins=41, range=(-0.02, 0.02))
+uh, ue = np.histogram(un, bins=61, range=(-0.03, 0.03))
 pvals = np.unique(np.round(pa_, 4), return_counts=True)
 m = int((d != 0).sum()); w = int((d > 0).sum())
 R["permModels"] = {
@@ -442,7 +442,7 @@ const claims = [
   ["q10-loans", pct1(R.selection.approvedRate)],
   ["q10-loans", pct1(R.selection.population)],
   ["q10-fix", pct1(R.selection.exploreRate)],
-  ["q11-log", `minus ${big(-Math.round(R.mle.logLik)).replace("one thousand three hundred and", "thirteen hundred and")}`],
+  ["q11-log-zero", `minus ${big(-Math.round(R.mle.logLik)).replace("one thousand three hundred and", "thirteen hundred and")}`],
   ["q11-small", "four in five"],
   ["q12-fraud", `${words(R.bayes.rare.caught)} frauds and ${big(R.bayes.rare.falseFlags)} honest`],
   ["q12-fraud", `${pctWords(R.bayes.rare.precision)} of the time`],

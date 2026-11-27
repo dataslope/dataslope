@@ -98,7 +98,9 @@ export const RecScene: React.FC = () => {
     const v = cells[r * GRID.items + c];
     if (r === newUser && c === newItem) return ease(frame, popularAt + 8, 8) > 0.5 && v < 0.5 ? "guess" : "none";
     if (c === newItem) {
-      if (ease(frame, purposeAt + 6 + r * 3, 8) > 0.5 && v < 0.55) return "shown";
+      // Some exposure, not all of it: the three users the item's metadata
+      // already suggested it to.
+      if (ease(frame, purposeAt + 6 + r * 3, 8) > 0.5 && v < 0.35) return "shown";
       return ease(frame, metaAt + 4 + r * 2, 8) > 0.5 && v < 0.35 ? "guess" : "none";
     }
     if (r === newUser) {

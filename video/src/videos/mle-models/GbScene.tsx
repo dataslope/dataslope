@@ -36,7 +36,9 @@ export const GbScene: React.FC = () => {
   const qAt = n.word("gb", "Question thirteen");
   const textAt = n.word("gb", "What is gradient boosting?");
   const addsAt = n.word("gb", "It adds shallow trees one at a time");
+  const oneAtATime = n.word("gb", "one at a time");
   const fittedAt = n.word("gb", "each fitted to the negative gradient");
+  const negAt = n.word("gb", "negative gradient");
   const residAt = n.word("gb", "the residuals");
   const libsAt = n.word("gb", "XGBoost, LightGBM and CatBoost");
   const sampAt = n.word("gb", "add sampling");
@@ -57,7 +59,9 @@ export const GbScene: React.FC = () => {
   const end = n.beat("gb-prod").to;
 
   // ── The mechanism: residuals shrink as trees are added ──
-  const trees = [addsAt + 10, fittedAt + 6, residAt + 4];
+  // The residuals draw first and hold, finished, for about a second before
+  // the first tree lands, so its shrink is seen from a whole starting state.
+  const trees = [oneAtATime + 8, negAt + 6, residAt + 8];
   const added = trees.filter((t) => frame >= t).length;
   const shrink = trees.reduce((k, t) => k * (1 - (1 - KEEP) * ease(frame, t, 14)), 1);
   const base = y(540);
@@ -154,14 +158,15 @@ export const GbScene: React.FC = () => {
           <Curve points={pts(r1.validation, r1.best - 1)} x={C.x} y={C.y} at={climbsAt - 2} dur={24} color={ACCENT} width={3.4} clip={chart} />
           <Curve points={pts(r01.validation)} x={C.x} y={C.y} at={pointAt + 4} dur={36} color={OK} width={3.4} clip={chart} />
           {[
-            { run: r1, a: twelveAt, ink: INK, c: INK, name: "Rate 1.0" },
-            { run: r01, a: fallingAt + 20, ink: OK_INK, c: OK, name: "Rate 0.1" },
+            // Each label between two gridlines and clear of the curves.
+            { run: r1, a: twelveAt, ink: INK, c: INK, name: "Rate 1.0", below: h(38) },
+            { run: r01, a: fallingAt + 20, ink: OK_INK, c: OK, name: "Rate 0.1", below: h(16) },
           ].map((m) => (
             <React.Fragment key={m.name}>
               <Svg opacity={ease(frame, m.a - 2, 10)}>
                 <circle cx={at(C.x, m.run.best)} cy={at(C.y, m.run.bestValidation)} r={8} fill={m.c} stroke={PAPER} strokeWidth={2} />
               </Svg>
-              <Line at={m.a - 2} x={at(C.x, m.run.best) - 10} y={at(C.y, m.run.bestValidation) + h(16)} size={23} color={m.ink} align="right" width={400}>
+              <Line at={m.a - 2} x={at(C.x, m.run.best) - 10} y={at(C.y, m.run.bestValidation) + m.below} size={23} color={m.ink} align="right" width={400}>
                 {m.run.best} trees: {m.run.bestValidation.toFixed(2)}
               </Line>
             </React.Fragment>

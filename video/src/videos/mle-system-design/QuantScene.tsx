@@ -108,6 +108,7 @@ export const QuantScene: React.FC = () => {
         </QuestionCard>
         <MiniMap
           at={qAt}
+          store
           lit={[
             ["model", qAt + 10],
             ["labels", labelsInAt],
@@ -236,17 +237,15 @@ export const QuantScene: React.FC = () => {
           </span>
         </Ink>
 
-        {/* What fewer bits buy. */}
+        {/* What fewer bits buy: one line under the bars, not one benefit per
+            row, since all three come from fewer bits. It sits where the 3-
+            and 2-bit rows arrive later, and leaves before they do. */}
         <Fade out={netAt}>
-          {[
-            { t: "Smaller", at: smallerAt },
-            { t: "Less data through memory", at: memoryAt },
-            { t: "Usually faster", at: fasterAt },
-          ].map((e, i) => (
-            <Line key={e.t} at={e.at} x={CHANGED_X - 40} y={rowTop(i)} size={22}>
-              {e.t}
-            </Line>
-          ))}
+          <Line at={smallerAt} x={X0} y={rowTop(3) + h(20)} size={22}>
+            Fewer bits: smaller
+            <span style={{ opacity: ease(frame, memoryAt, 10) }}>, less data through memory</span>
+            <span style={{ opacity: ease(frame, fasterAt, 10) }}>, usually faster</span>
+          </Line>
         </Fade>
 
         {/* ── The network and its digits ── */}

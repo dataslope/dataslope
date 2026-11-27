@@ -98,10 +98,11 @@ export const CeScene: React.FC = () => {
           <Svg opacity={ease(frame, confAt, 10)}>
             <circle cx={at(L.x, WRONG)} cy={at(L.y, -Math.log(WRONG))} r={10} fill={ACCENT} />
           </Svg>
-          <Line at={confAt} x={at(L.x, WRONG) + 24} y={at(L.y, -Math.log(WRONG)) - 18} size={23} color={ACCENT_INK}>
+          {/* Both labels sit between gridlines, never on one. */}
+          <Line at={confAt} x={at(L.x, WRONG) + 24} y={at(L.y, 3.6) - 18} size={23} color={ACCENT_INK}>
             Confident and wrong: <MathRun><I>p</I> = {WRONG}</MathRun>, loss {(-Math.log(WRONG)).toFixed(1)}
           </Line>
-          <Line at={limitAt} x={at(L.x, WRONG) + 24} y={left.top - h(14)} size={23} color={INK}>
+          <Line at={limitAt} x={at(L.x, WRONG) + 24} y={at(L.y, 4.55) - 18} size={23} color={INK}>
             No limit as <MathRun><I>p</I> → 0</MathRun>
           </Line>
 
@@ -169,7 +170,8 @@ export const CeScene: React.FC = () => {
                 <line x1={at(T.x, m.s)} x2={at(T.x, m.s)} y1={at(T.y, CE.target)} y2={run.top + run.height} stroke={m.c} strokeWidth={2} strokeDasharray="3 5" />
                 <circle cx={at(T.x, m.s)} cy={at(T.y, CE.target)} r={8} fill={m.c} />
               </Svg>
-              <Line at={m.a - 2} x={at(T.x, m.s) + 16} y={at(T.y, CE.target) + h(30)} size={24} color={m.ink}>
+              {/* Under the 75% gridline, clear of it. */}
+              <Line at={m.a - 2} x={at(T.x, m.s) + 16} y={at(T.y, 0.75) + h(10)} size={24} color={m.ink}>
                 {m.name}: {m.s} steps
               </Line>
             </React.Fragment>

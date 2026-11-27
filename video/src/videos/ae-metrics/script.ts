@@ -139,8 +139,9 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     "view: dimensions, measures" and "explore: joins" (no code: the page
  *     shows none). r-measure: SUM(amount) against "completed revenue". r-additive: three rows (revenue, a
  *     balance, a ratio), ticks across dimensions and time. r-cumulative: a
- *     28-day window sliding along a day axis. r-governance: the five parts
- *     ticked, the rubber-stamp spot on "certification". r-where: Snowflake
+ *     28-day trailing window sliding along a day axis to today, and under
+ *     it a month-to-date window from the 1st to today. r-governance: the
+ *     five parts ticked, the rubber-stamp spot on "certification". r-where: Snowflake
  *     and Databricks as two boxes, a red arrow between them crossed out
  *     (portability), then Apache Ossie in green.
  *   next: the list complete; the pelican back; NextLine "Next: AI and the
@@ -210,6 +211,13 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  * testJoinedUnique). Question 9's three revenues are drawn in ink, none marked
  * right, and become "the layer's revenue", not SUM(amount): no reading of
  * revenue is crowned (Part 9 governs net revenue). No label is struck through.
+ *
+ * Second review (agent-outputs/20261126-ae-mle-video-review/): r-cumulative
+ * is split in three and only its middle sentence re-voiced, because
+ * month-to-date is a to-date window from the 1st, not a trailing one (dbt's
+ * cumulative metrics: grain_to_date against window; the page lists both
+ * under "a trailing window"). Question 4's LEFT JOIN row says its 0.00 is
+ * COALESCE's (check.mjs chasm.fix), since a left join alone leaves NULL.
  *
  * Written for Drew's ear: SQL, BI, API and YAML in plain caps (SQL and YAML
  * are said by the lexicon); BI expanded once, in question five; LookML as
@@ -342,7 +350,8 @@ export const script: NarrationScript = {
     {
       id: "chasm-left",
       text: "Join them to the customer with left joins, though. Ben paid forty dollars and was never refunded, and an inner join drops him.",
-      pauseAfter: 0.8,
+      // Held (2026-11-26 review) so the COALESCE note under Ben's row is read.
+      pauseAfter: 2.4,
     },
 
     // ── 5, 6. The semantic layer, and what it is made of ──────────────────
@@ -478,7 +487,20 @@ export const script: NarrationScript = {
     },
     {
       id: "r-cumulative",
-      text: "Question seventeen. What is a cumulative or time-window metric, and why define it centrally? It aggregates over a trailing window, like rolling twenty-eight-day active users, or month-to-date revenue. Windows are easy to get subtly different by hand, so define the grain and the window once.",
+      text: "Question seventeen. What is a cumulative or time-window metric, and why define it centrally?",
+      pauseAfter: 0.55,
+    },
+    {
+      // Re-voiced alone (2026-11-26 review): month-to-date is a to-date
+      // window from the 1st, not a trailing one (dbt: grain_to_date against
+      // window). The beats either side are cut from the kept take.
+      id: "r-cumulative-window",
+      text: "It aggregates over a window, not a single period: a trailing one, like rolling twenty-eight-day active users, or one from the start of the month, like month-to-date revenue.",
+      pauseAfter: 0.55,
+    },
+    {
+      id: "r-cumulative-once",
+      text: "Windows are easy to get subtly different by hand, so define the grain and the window once.",
       pauseAfter: 1.2,
     },
     {

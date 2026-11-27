@@ -204,8 +204,17 @@ export const ReservoirScene: React.FC = () => {
               : <MathRun>1 / <I>j</I></MathRun>
             </Fade>
           </span>
+          {/* Why 1 / j, and what the chain's factors are (review
+              2026-11-26): j gets in with k / j and takes one of k slots, so
+              item i survives it with 1 - 1 / j. */}
+          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap", marginTop: -h(8), opacity: ease(frame, oneOverAt + 10, 10) }}>
+            it gets in with <MathRun><I>k</I> / <I>j</I></MathRun>, then takes that slot with <MathRun>1 / <I>k</I></MathRun>
+          </span>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap", opacity: ease(frame, multAt - 4, 10) }}>
+            So item <MathRun><I>i</I></MathRun> survives each one: <MathRun>(<I>j</I> − 1) / <I>j</I></MathRun>
+          </span>
         </div>
-        <div style={{ position: "absolute", left: X0, top: y(740), fontSize: 30, color: INK, whiteSpace: "nowrap", display: "flex", alignItems: "center", opacity: ease(frame, multAt, 12) }}>
+        <div style={{ position: "absolute", left: X0, top: y(818), fontSize: 30, color: INK, whiteSpace: "nowrap", display: "flex", alignItems: "center", opacity: ease(frame, multAt, 12) }}>
           <MathRun>
             <Frac a={<I>k</I>} b={<I>i</I>} />
             {" × "}
@@ -248,7 +257,8 @@ export const ReservoirScene: React.FC = () => {
           First {k} lines: all from the start of the day
         </Line>
         <Line at={coinAt} x={R_X} y={y(806) + h(42)} size={23} color={ACCENT_INK}>
-          Each line kept with <MathRun><I>p</I></MathRun> = 1%: {RESERVOIR.coinSizes.p5} to {RESERVOIR.coinSizes.p95} lines
+          {/* coinSizes is the 5th to 95th percentile, not the range (review 2026-11-26). */}
+          Each line kept with <MathRun><I>p</I></MathRun> = 1%, in 9 runs of 10: {RESERVOIR.coinSizes.p5} to {RESERVOIR.coinSizes.p95} lines
           <Fade at={notTenAt}>, not {k}</Fade>
         </Line>
       </Drift>

@@ -141,7 +141,7 @@ export const CnnScene: React.FC = () => {
   const pooled = Array.from({ length: 4 }, (_, r) =>
     Array.from({ length: 4 }, (_, c) => {
       const vals = [CNN.shiftedMap[2 * r][2 * c], CNN.shiftedMap[2 * r][2 * c + 1], CNN.shiftedMap[2 * r + 1][2 * c], CNN.shiftedMap[2 * r + 1][2 * c + 1]];
-      return vals.reduce((a, b) => (Math.abs(b) > Math.abs(a) ? b : a), 0);
+      return Math.max(...vals);
     }),
   );
   const poolP = ease(frame, poolAt, 14);
@@ -151,8 +151,8 @@ export const CnnScene: React.FC = () => {
   const LOG_W = 1180;
   const logW = (v: number) => (Math.log10(v) / 9) * LOG_W;
   const layers = [
-    { name: "Conv2d(3, 16)", count: CNN.conv1 },
-    { name: "Conv2d(16, 32)", count: CNN.conv2 },
+    { name: "Conv2d(3, 16, 3)", count: CNN.conv1 },
+    { name: "Conv2d(16, 32, 3)", count: CNN.conv2 },
     { name: "Linear(32, 10)", count: CNN.head },
   ];
 

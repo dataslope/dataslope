@@ -372,7 +372,7 @@ export const script: NarrationScript = {
     {
       id: "latest-where",
       text: "The filter goes in a wrapping query, because where can't see a window function. Postgres says so.",
-      pauseAfter: 0.6,
+      pauseAfter: 1.0,
     },
     {
       id: "latest-max",

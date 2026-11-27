@@ -23,7 +23,10 @@ const COL_X = 1080;
 const STRIP_W = 40;
 const STRIP_GAP = 10;
 const CHIP = { x: X0, w: 180, h: 60 };
-const T_BOX = { x: 1460, w: 240, h: 64 };
+const T_BOX = { x: 1450, w: 240, h: 64 };
+/** The warehouse's edge, drawn round the strips and the transform together
+ *  when the narration says "transformed there". */
+const WH = { left: COL_X - 30, right: 1800, pad: 30 };
 
 /**
  * Question 3. Left, an app's database (OLTP): rows stored whole, each request
@@ -206,6 +209,33 @@ export const OltpScene: React.FC = () => {
         <Flow points={[[stripX(AMOUNT) + STRIP_W / 2, gridTop + 8], [stripX(AMOUNT) + STRIP_W / 2, gridBottom - (rowH - cellH) - 8]]} at={byColAt + 10} dur={20} color={PAPER} width={3} head={12} />
 
         {/* ── Extract, load, and the transform inside ── */}
+        {/* One edge round the columns and the transform, so the T sits inside
+            the warehouse (ELT), not after it as a stage of its own. */}
+        <div
+          style={{
+            position: "absolute",
+            left: WH.left,
+            top: gridTop - 7 - WH.pad,
+            width: WH.right - WH.left,
+            height: gridBottom - (rowH - cellH) + 7 + WH.pad - (gridTop - 7 - WH.pad),
+            boxSizing: "border-box",
+            border: `2px solid ${INK_SOFT}`,
+            borderRadius: 8,
+            opacity: ease(frame, transformAt - 6, 12),
+          }}
+        />
+        <div
+          style={{
+            position: "absolute",
+            right: 1920 - WH.right + 18,
+            top: gridTop - 7 - WH.pad + 12,
+            ...note(21, INK_SOFT),
+            whiteSpace: "nowrap",
+            opacity: ease(frame, transformAt - 2, 12),
+          }}
+        >
+          Inside the warehouse
+        </div>
         <Flow points={[[ROW_X + cols.length * CELL_W + 14, mid], [COL_X - 16, mid]]} at={extractAt} dur={24} color={INK} width={2.6} />
         <Note at={extractAt + 2} x={ROW_X + cols.length * CELL_W + 30} y={mid - h(44)}>
           <span style={{ ...note(22, INK), fontWeight: 500, whiteSpace: "nowrap" }}>Extract</span>

@@ -97,7 +97,7 @@ export const BayesScene: React.FC = () => {
             <span style={{ opacity: ease(frame, overAt - 2, 10) }}> / evidence</span>
           </span>
         </Ink>
-        <Ink at={overAt + 4} dur={16} style={{ left: X0, top: y(378), whiteSpace: "nowrap" }}>
+        <Ink at={overAt + 4} dur={16} out={sayAt + 8} style={{ left: X0, top: y(378), whiteSpace: "nowrap" }}>
           <span style={{ ...note(34, INK) }}>
             <MathRun>
               <P>
@@ -114,6 +114,15 @@ export const BayesScene: React.FC = () => {
               <P>
                 <I>B</I>
               </P>
+            </MathRun>
+          </span>
+        </Ink>
+        {/* The same theorem in the example's own terms, so the 99%, the 1 in
+            1,000 and the 9% each have a place in it. */}
+        <Ink at={sayAt + 16} dur={16} style={{ left: X0, top: y(378), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(30, INK) }}>
+            <MathRun>
+              <P>fraud | flag</P> = <P>flag | fraud</P> <P>fraud</P> / <P>flag</P>
             </MathRun>
           </span>
         </Ink>

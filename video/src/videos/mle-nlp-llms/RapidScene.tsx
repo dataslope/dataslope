@@ -229,6 +229,8 @@ const Randomness: React.FC<{ c: Ctx }> = ({ c }) => {
   const toppAt = c.w("r-random", "top-p, the smallest set");
   const lowAt = c.w("r-random", "Keep it low for extraction");
   const brainAt = c.w("r-random", "higher for brainstorming");
+  const hostAt = c.w("r-random-host", "A hosted reasoning model");
+  const steerAt = c.w("r-random-host", "you steer with the prompt");
   const L = ILLUS;
   const T = 1 + (0.25 - 1) * ease(frame, zeroAt + 4, 20) + (2.2 - 0.25) * ease(frame, higherAt + 4, 24) + (1 - 2.2) * ease(frame, topkAt - 8, 16);
   const probs = softmax(L.nextScores, T);
@@ -274,6 +276,13 @@ const Randomness: React.FC<{ c: Ctx }> = ({ c }) => {
       </Line>
       <Line at={lowAt} x={R_X} y={c.y(770)} size={26}>
         Low for extraction<span style={{ opacity: ease(frame, brainAt, 10) }}>, higher for brainstorming</span>
+      </Line>
+      {/* The page's follow-up: a hosted model may not take these settings. */}
+      <Line at={hostAt} x={R_X} y={c.y(822)} size={24} weight={600}>
+        Hosted reasoning models may refuse them
+      </Line>
+      <Line at={steerAt} x={R_X} y={c.y(822) + c.h(38)} size={22} color={INK_SOFT}>
+        Steer with the prompt, reasoning effort, structured outputs
       </Line>
     </>
   );

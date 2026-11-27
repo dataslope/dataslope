@@ -7,7 +7,7 @@ import { label, svgText } from "../../editorial/style";
 import { Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { ColHead, DATA_FILL, Drift, GOLD, INK, INK_SOFT, lerp, Line, Mark, OK, OK_INK, Q_SIZE, Svg, X0 } from "./parts";
+import { ColHead, DATA_FILL, Drift, INK, INK_SOFT, lerp, Line, Mark, OK, OK_INK, Q_SIZE, Svg, X0 } from "./parts";
 
 const PANELS = [
   { x: X0, w: 740 },
@@ -55,7 +55,6 @@ export const ContextScene: React.FC = () => {
   const wonAt = n.word("q3-a", "transformers won");
   const passAt = n.word("q3-cost", "a pass through the model");
   const lookupAt = n.word("q3-cost", "a table lookup");
-  const attnAt = n.word("attn-in", "attention");
   const end = n.beat("attn-in").to;
 
   const spaceTop = y(410);
@@ -85,7 +84,6 @@ export const ContextScene: React.FC = () => {
       <Sfx name="el-sprinkle" at={transAt + 4} level={-35} />
       <Sfx name="el-whoosh" at={sepAt} level={-35} />
       <Sfx name="el-pencil" at={lookupAt} level={-37} />
-      <Sfx name="el-pencil" at={attnAt} level={-36} />
 
       <Drift from={from} to={end + 40} scale={0.014}>
         <QuestionCard n={3} at={qAt - 4} textAt={textAt - 4} size={Q_SIZE}>
@@ -106,23 +104,6 @@ export const ContextScene: React.FC = () => {
           {ease(frame, bankAt + 4, 10) > 0 ? (
             <circle cx={px(0, STATIC_BANK[0])} cy={py(STATIC_BANK[1])} r={11} fill={INK} opacity={ease(frame, bankAt + 4, 10)} />
           ) : null}
-          {/* On "attention": each contextual bank drawn from a word around it,
-              one each, approached from the side away from the word's label. */}
-          {BANKS.map((b, i) =>
-            (i === 0 ? [RIVER[1]] : [MONEY[0]]).map(([word, u, v], k) => {
-              const p = ease(frame, attnAt + i * 6 + k * 3, 12);
-              if (p <= 0) return null;
-              const x1 = px(1, b.at[0]);
-              const y1 = py(b.at[1]);
-              // Stop short of both dots, so the line never runs into a dot or its label.
-              const dx = px(1, u) - x1;
-              const dy = py(v) - y1;
-              const len = Math.hypot(dx, dy);
-              const a = 16 / len;
-              const z = a + (1 - 2 * a) * p;
-              return <line key={`${i}-${word}`} x1={x1 + dx * a} y1={y1 + dy * a} x2={x1 + dx * z} y2={y1 + dy * z} stroke={GOLD} strokeWidth={2.4} />;
-            }),
-          )}
           {/* Contextual: one point per occurrence, each into its own sense. */}
           {BANKS.map((b, i) => {
             const o = ease(frame, freshAt + i * 6, 10);

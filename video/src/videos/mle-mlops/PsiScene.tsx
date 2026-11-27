@@ -177,6 +177,12 @@ export const PsiScene: React.FC = () => {
             One feature: its distribution now, against training
           </Line>
           <Buckets x={chart.x} y={chart.top} w={chart.w} h={chart.h} trainAt={cutAt + 4} nowAt={diffAt - 4} shares={shares} />
+          {/* The page's third dependency (bins, sample size, smoothing): a
+              bucket the window leaves empty sends the log to infinity, which
+              is why the page's compute_psi adds an eps to every count. */}
+          <Line at={logAt + 12} x={chart.x} y={chart.top + chart.h + h(64)} size={21} color={INK_SOFT}>
+            An empty bucket gets a tiny <M>ε</M>, or <M>ln 0</M> makes PSI infinite
+          </Line>
           <ColumnRule x={RULE_X} top={y(410)} height={chart.h + h(70)} at={addAt} />
           <Line at={addAt - 4} x={RIGHT_X} y={y(410)} size={34} color={INK}>
             <MathRun>

@@ -86,7 +86,8 @@ export const EmbedScene: React.FC = () => {
 
   // ── word2vec ──
   const panelTop = y(586);
-  const chipY = panelTop + h(110);
+  // Low enough that the arcs over the sentence clear the heading's rule by 28px.
+  const chipY = panelTop + h(136);
   const ADV = 22 * 0.6;
   const widths = SENT.map((w) => w.length * ADV + 24);
   const xs = widths.map((_, i) => X0 + widths.slice(0, i).reduce((a, b) => a + b + 12, 0));
@@ -238,7 +239,7 @@ export const EmbedScene: React.FC = () => {
 
         {/* ── How word2vec and GloVe learn them ── */}
         <ColHead at={w2vAt} x={X0} y={panelTop} w={780}>
-          word2vec: prediction
+          word2vec: prediction (skip-gram)
         </ColHead>
         {SENT.map((w, i) => {
           const p = ease(frame, w2vAt + 2 + i * 1.5, 10);
@@ -288,7 +289,7 @@ export const EmbedScene: React.FC = () => {
         {[CENTRE - 2, CENTRE - 1, CENTRE + 1, CENTRE + 2].map((j, k) => {
           const x1 = mid(CENTRE);
           const x2 = mid(j);
-          const lift = h(40) + Math.abs(j - CENTRE) * h(16);
+          const lift = h(30) + Math.abs(j - CENTRE) * h(14);
           const top0 = chipY - 8;
           return (
             <Flow
@@ -345,7 +346,11 @@ export const EmbedScene: React.FC = () => {
           two thin matrices
         </Line>
 
-        <Line at={bothAt} x={X0} y={y(866)} size={26} weight={500}>
+        <Line at={neighAt + 30} x={X0} y={chipY + h(112)} size={21} color={INK_SOFT}>
+          CBOW, the other variant: the neighbors predict the word
+        </Line>
+
+        <Line at={bothAt} x={X0} y={y(884)} size={26} weight={500}>
           Both give each word <Mark at={fixedAt + 4}>one fixed vector</Mark>
         </Line>
       </Drift>
