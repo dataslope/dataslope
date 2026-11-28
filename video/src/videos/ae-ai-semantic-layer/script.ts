@@ -320,7 +320,9 @@ export const script: NarrationScript = {
     },
     {
       id: "t2s-past",
-      text: "And no query can find the right one in the rows.",
+      // [slowly]: the take said it at 4.4 words a second, the video's fastest
+      // beat (both reviews); re-voiced alone with the tag, same words.
+      text: "[slowly] And no query can find the right one in the rows.",
       pauseAfter: 0.6,
     },
     {
