@@ -164,7 +164,8 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     marked "maximum likelihood" (MLE.grid, MLE.curveSmoothed).
  *   q11-log: "0.5 × 0.5 × … (2,000 times) = 0.0" in red; "log: −1,386.29"
  *     in green. q11-log-peak: "The log only ever rises, so the peak stays
- *     put", the follow-up an interviewer asks.
+ *     put", the follow-up an interviewer asks (the page says it too since
+ *     2026-11-28).
  *   q11-loss: two lines: "Normal likelihood → squared error",
  *     "Bernoulli likelihood → log loss", each lit as said.
  *   q11-small: the likelihood for 3 clicks in 3 views (MLE.curve33) piling

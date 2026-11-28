@@ -229,7 +229,8 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     reduce the bytes read, since on-demand billing counts the columns
  *     scanned (BigQuery's cost-control guidance); "hurt-month", the usual
  *     target of about 128 MB to 1 GB a file, de-warehousing's small.target,
- *     against 780 kB month files; "compute-size", each Snowflake warehouse
+ *     against 780 kB month files; "compute-size" (on the page too since
+ *     2026-11-28, with the same source), each Snowflake warehouse
  *     size up doubles the credits it bills per hour (Snowflake's
  *     "Overview of warehouses": X-Small 1, Small 2, Medium 4, Large 8, and
  *     so on), so with cost as rate times time, a bigger warehouse costs no

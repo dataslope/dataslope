@@ -39,23 +39,6 @@ const USERS = (() => {
   });
 })();
 
-/** A hat drawn over its letter. The combining circumflex (θ̂) lands to the
- *  right of an italic θ in the serif, over the subscript that follows it, so
- *  the hat is a small stroked chevron instead (a shape, not a second glyph
- *  on top of the first, which the page audit would report as an overlap). */
-const Hat: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <span style={{ position: "relative", display: "inline-block" }}>
-    {children}
-    <svg
-      viewBox="0 0 10 5"
-      preserveAspectRatio="none"
-      style={{ position: "absolute", left: "0.2em", top: "-0.12em", width: "0.36em", height: "0.16em", overflow: "visible" }}
-    >
-      <polyline points="0,5 5,0 10,5" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinejoin="round" vectorEffect="non-scaling-stroke" />
-    </svg>
-  </span>
-);
-
 /**
  * Question 5. The bootstrap as a picture: ten points, resampled with
  * replacement three times (repeats stacked, dropouts faded), the statistic
@@ -215,9 +198,7 @@ export const BootScene: React.FC = () => {
                   >
                     →{" "}
                     <MathRun>
-                      <Hat>
-                        <I>θ</I>
-                      </Hat>
+                      <I>{"θ\u0302"}</I>
                       <sub style={{ fontSize: "0.7em" }}>{r}</sub>
                     </MathRun>
                   </div>

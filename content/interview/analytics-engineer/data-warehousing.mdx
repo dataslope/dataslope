@@ -249,7 +249,9 @@ database competes with the app and performs poorly.
 
 It is the **compute** that executes queries, sized independently of storage.
 Snowflake bills virtual-warehouse **credits per second** while running (so
-auto-suspend saves money); BigQuery bills **bytes scanned** on demand or
+auto-suspend saves money), at a rate set by the warehouse's size: each size up
+doubles the credits per hour, so a larger warehouse costs no more only if it
+finishes in half the time.[^snowflake-sizes] BigQuery bills **bytes scanned** on demand or
 reserved **slots**; Redshift bills provisioned nodes (or serverless RPUs).
 Knowing your billing model tells you which lever, less data scanned vs less
 compute time, actually reduces the bill.
@@ -379,3 +381,5 @@ ORDER BY customer_id;`}
 
 - [SQL Analytics with DuckDB](/courses/sql-analytics-duckdb)
 - [Database Design with PostgreSQL](/courses/database-design-postgresql)
+
+[^snowflake-sizes]: Snowflake, [*Overview of warehouses*](https://docs.snowflake.com/en/user-guide/warehouses-overview): an X-Small warehouse uses 1 credit an hour, a Small 2, a Medium 4, and so on, doubling with each size.

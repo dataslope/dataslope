@@ -241,7 +241,7 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     q2-bar (agreement with the experts about as high as theirs with each
  *     other) is Zheng et al.'s own test, the paper the page cites: GPT-4's
  *     agreement with human judges matched the humans' agreement with each
- *     other.
+ *     other. The page states the bar too, since 2026-11-28.
  *   - q3: the halves, recall@k, MRR, faithfulness, answer relevance,
  *     citation accuracy, "If retrieval misses, no prompt fixes it", Liu et
  *     al.'s finding and "a reranker earns its latency": the page. The

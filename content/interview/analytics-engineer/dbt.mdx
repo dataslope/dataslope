@@ -443,7 +443,7 @@ A normal incremental run filters source data to only new/changed rows using your
 
 ### How do you version a dbt model?
 
-dbt supports **model versioning** natively (v1.5+): you declare multiple versions of a model in YAML with a `versions:` key, each potentially pointing to a different SQL file. Downstream models can pin to a specific version using `ref('model_name', version=1)`. This lets you roll out breaking schema changes gradually without forcing all consumers to migrate at once.
+dbt supports **model versioning** natively (v1.5+): you declare multiple versions of a model in YAML with a `versions:` key, each potentially pointing to a different SQL file. Downstream models can pin to a specific version using `ref('model_name', version=1)`. This lets you roll out breaking schema changes gradually without forcing all consumers to migrate at once. Only pinned consumers stay put, though: a `ref` with no version resolves to the model's `latest_version`, which defaults to the highest version, so adding v2 moves every unpinned consumer to it at once. Set `latest_version: 1` until consumers have moved, then raise it.
 
 ### What is the dbt lineage DAG, and how is it built?
 

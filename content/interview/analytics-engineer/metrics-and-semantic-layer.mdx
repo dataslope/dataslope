@@ -250,11 +250,15 @@ dimensions, and metrics.
 
 ### What is a cumulative or time-window metric, and why define it centrally?
 
-A cumulative metric aggregates over a trailing window (rolling 28-day active
-users, month-to-date revenue) rather than a single period. The windowing logic
-is easy to implement inconsistently by hand, so defining it once in the semantic
-layer, with an explicit grain and window, keeps "monthly active users" identical
-everywhere it appears.
+A cumulative metric aggregates over a window rather than a single period. The
+window is either **trailing**, a fixed length ending today (rolling 28-day active
+users), or **to-date**, running from the start of a period (month-to-date
+revenue). The two give different numbers: on the 5th of the month, month-to-date
+covers 5 days where a trailing 28 days covers 28. In dbt's semantic layer the
+first is a cumulative metric's `window` and the second its `grain_to_date`. The
+windowing logic is easy to implement inconsistently by hand, so defining it once
+in the semantic layer, with an explicit grain and window, keeps "monthly active
+users" identical everywhere it appears.
 
 ### When is a wide, pre-joined mart preferable to querying through a semantic layer?
 
