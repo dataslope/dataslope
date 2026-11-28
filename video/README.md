@@ -340,6 +340,17 @@ Every video follows these rules.
   one in the drawn page, which also catches text that arrives as a value (a
   sheet cell "P-101", a list item): `PageAudit` in `src/editorial/audit.tsx`
   reads the page while it renders.
+- **Math in the math face.** Formulas, big-O, Greek letters and named
+  quantities (p, H0, R², log loss) are set with `<M>`, or `MathRun` and `I`
+  for live numbers and highlights (`src/editorial/math.tsx`): the house
+  serif at Inter's x-height, variables italic, digits and operators upright.
+  **An accent is written as the letter and its combining mark**,
+  `<I>{"p̂"}</I>` or "p̂" inside `<M>`, and the kit draws it: the
+  serif's Unicode subsets have no combining circumflex or dot, and its Greek
+  subset no combining mark at all, so a font-set p̂ fell back to another
+  font and θ̂ left its hat to the right of the θ. The drawn hat, bar, tilde
+  and dot match Source Serif 4's own â, ā and ã. Never draw an accent in a
+  video's own folder.
 - **A space stays a space.** Words set as separate elements are spaced by
   margins, so two things can eat the space between them. An `em` gap on a
   flex row means the row's own font size, which is the page default (16px)

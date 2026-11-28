@@ -22,15 +22,143 @@ import { SERIF } from "./fonts";
 const FUNCS = new Set(["log", "ln", "lg", "max", "min", "exp"]);
 const SUPER: Record<string, string> = { "²": "2", "³": "3", "ⁿ": "n", "ᵏ": "k" };
 
+/**
+ * Accents over a math variable: x̄, p̂, θ̂, ẋ, x̃. They are drawn, never left to
+ * the font. The serif is loaded as Unicode subsets (Fontsource), and no
+ * subset of Source Serif 4 maps the combining circumflex (U+0302) or the dot
+ * (U+0307); the Greek subset maps no combining mark at all. A letter and a
+ * mark the browser cannot find in one file are not shaped together: p̂ fell
+ * back whole to another font, a heavier p beside the serif, and θ̂ kept the
+ * serif's θ with a fallback hat loose to its right (MLE Part 4's review,
+ * 2026-11-26). The macron happens to be in the Latin subset, so x̄ rendered
+ * properly; it is drawn too, so every accent reads the same in every face.
+ *
+ * Each mark is sized and placed to match Source Serif 4's own accents
+ * (its precomposed â, Â, ā, Ā side by side with these): anchored to the
+ * baseline, not to the line box, so a face with other metrics or another
+ * line-height does not move it; raised to clear the letter's x-height,
+ * cap height or ascender; and shifted right along the 12° italic slant, so
+ * it sits over the letter's ink rather than its advance.
+ */
+type AccentMark = "hat" | "bar" | "dot" | "tilde";
+const COMBINING: Record<string, AccentMark> = {
+  "̂": "hat",
+  "̄": "bar",
+  "̅": "bar",
+  "̇": "dot",
+  "̃": "tilde",
+};
+/** Letters whose tops reach the ascender (0.74em, above a capital's 0.67). */
+const ASCENDER = /[bdfhklθδλβζξ]/;
+/** Capitals, Latin and Greek. */
+const CAPITAL = /[A-ZΑ-Ω]/;
+/**
+ * Each mark's width, height, the height of its bottom above the baseline, and
+ * how far right of the letter's centre it sits (the italic slant), in em, for
+ * an x-height letter, a capital and an ascender letter. Measured from Source
+ * Serif 4 Italic's own precomposed letters: â and Â for the hat, ā and Ā for
+ * the bar, ã and Ã for the tilde; an ascender takes the capital's mark raised
+ * by the 0.07em an ascender stands above a capital. The font has no dotted
+ * Latin letter in these subsets, so the dot follows the bar's placement.
+ */
+type Fit = { w: number; h: number; bottom: number; dx: number };
+const fits = (lower: Fit, cap: Fit, dxAsc = cap.dx + 0.015): [Fit, Fit, Fit] => [
+  lower,
+  cap,
+  { ...cap, bottom: cap.bottom + 0.07, dx: dxAsc },
+];
+const MARKS: Record<AccentMark, { fit: [Fit, Fit, Fit]; draw: (w: number, h: number) => React.ReactNode }> = {
+  hat: {
+    fit: fits({ w: 0.29, h: 0.19, bottom: 0.546, dx: 0.095 }, { w: 0.3, h: 0.14, bottom: 0.717, dx: 0.094 }),
+    // In units of 0.01em: a chevron stroked 5.4 (the font's circumflex weight).
+    draw: (w, h) => (
+      <polyline
+        points={`2.7,${h - 2.2} ${w / 2},3 ${w - 2.7},${h - 2.2}`}
+        fill="none"
+        stroke="currentColor"
+        strokeWidth={5.4}
+        strokeLinejoin="miter"
+      />
+    ),
+  },
+  bar: {
+    fit: fits({ w: 0.24, h: 0.06, bottom: 0.613, dx: 0.104 }, { w: 0.29, h: 0.058, bottom: 0.759, dx: 0.097 }),
+    draw: (w, h) => <rect x={0} y={0} width={w} height={h} fill="currentColor" />,
+  },
+  dot: {
+    fit: fits({ w: 0.085, h: 0.085, bottom: 0.6, dx: 0.104 }, { w: 0.09, h: 0.09, bottom: 0.75, dx: 0.097 }),
+    draw: (w, h) => <ellipse cx={w / 2} cy={h / 2} rx={w / 2} ry={h / 2} fill="currentColor" />,
+  },
+  tilde: {
+    fit: fits({ w: 0.33, h: 0.14, bottom: 0.575, dx: 0.104 }, { w: 0.36, h: 0.14, bottom: 0.724, dx: 0.099 }),
+    draw: (w, h) => (
+      <path
+        d={`M3,${h - 3} C${w * 0.2},3 ${w * 0.38},3 ${w / 2},${h / 2} S${w * 0.8},${h - 3} ${w - 3},3`}
+        fill="none"
+        stroke="currentColor"
+        strokeWidth={5}
+        strokeLinecap="round"
+      />
+    ),
+  },
+};
+
+/** Splits "p̂" into its letter and accent, or returns null for anything else. */
+const splitAccent = (text: string): [string, AccentMark] | null => {
+  const m = /^([A-Za-zΑ-Ωα-ω])([̂-̇])$/u.exec(text.normalize("NFD"));
+  return m && COMBINING[m[2]] ? [m[1], COMBINING[m[2]]] : null;
+};
+
+/**
+ * One italic letter with an accent drawn over it. Write `<I>{"p̂"}</I>`
+ * (or `<I>p̂</I>`, or "p̂" inside `<M>`): both find this. An inline grid holds
+ * the letter and the mark in one cell, baseline-aligned; the mark's own
+ * baseline is its bottom edge, so the transform raises it from the text's
+ * baseline exactly. Its negative margins keep it from widening the letter.
+ */
+export const Accent: React.FC<{ mark: AccentMark; children: string }> = ({ mark, children }) => {
+  const { w, h, bottom, dx } = MARKS[mark].fit[ASCENDER.test(children) ? 2 : CAPITAL.test(children) ? 1 : 0];
+  const [vw, vh] = [w * 100, h * 100];
+  return (
+    <span style={{ display: "inline-grid", verticalAlign: "baseline" }}>
+      <i style={{ gridArea: "1 / 1", alignSelf: "baseline", fontStyle: "italic" }}>{children}</i>
+      <svg
+        aria-hidden
+        viewBox={`0 0 ${vw} ${vh}`}
+        style={{
+          gridArea: "1 / 1",
+          alignSelf: "baseline",
+          justifySelf: "center",
+          width: `${w}em`,
+          height: `${h}em`,
+          margin: "0 -1em",
+          overflow: "visible",
+          transform: `translate(${dx}em, -${bottom}em)`,
+        }}
+      >
+        {MARKS[mark].draw(vw, vh)}
+      </svg>
+    </span>
+  );
+};
+
 /** One expression, tokenized: letters, digits, superscripts, the rest. */
 const tokens = (expr: string): React.ReactNode[] => {
   const out: React.ReactNode[] = [];
-  const re = /([A-Za-z]+)|([0-9]+(?:\.[0-9]+)?)|([²³ⁿᵏ])|\^(\{[^}]*\}|.)|(\s+)|(.)/g;
+  const re = /([A-Za-zΑ-Ωα-ω][̂-̇])|([A-Za-z]+)|([0-9]+(?:\.[0-9]+)?)|([²³ⁿᵏ])|\^(\{[^}]*\}|.)|(\s+)|(.)/gu;
+  const text = expr.normalize("NFD");
   let k = 0;
-  for (let m = re.exec(expr); m; m = re.exec(expr)) {
-    const [, word, num, sup, caret, space, other] = m;
+  for (let m = re.exec(text); m; m = re.exec(text)) {
+    const [, accented, word, num, sup, caret, space, other] = m;
     const key = k++;
-    if (word) {
+    const acc = accented ? splitAccent(accented) : null;
+    if (acc) {
+      out.push(
+        <Accent key={key} mark={acc[1]}>
+          {acc[0]}
+        </Accent>,
+      );
+    } else if (word) {
       if (FUNCS.has(word) || word.length > 1) out.push(<span key={key}>{word}</span>);
       else out.push(<i key={key}>{word}</i>);
     } else if (num) {
@@ -83,8 +211,14 @@ export const MathRun: React.FC<{ children: React.ReactNode; style?: React.CSSPro
   </span>
 );
 
-/** An italic math variable inside a MathRun (or beside M). */
-export const I: React.FC<{ children: React.ReactNode }> = ({ children }) => <i style={{ fontStyle: "italic" }}>{children}</i>;
+/** An italic math variable inside a MathRun (or beside M). A letter with a
+ *  combining accent (`<I>{"x\u0304"}</I>`, `<I>p̂</I>`) gets it drawn: see
+ *  `Accent`. */
+export const I: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const acc = typeof children === "string" ? splitAccent(children) : null;
+  if (acc) return <Accent mark={acc[1]}>{acc[0]}</Accent>;
+  return <i style={{ fontStyle: "italic" }}>{children}</i>;
+};
 
 /** Big-O and its cousins, with one level of nested parentheses, and the bare
  *  growth terms the videos write in prose. */
