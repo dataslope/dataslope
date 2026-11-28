@@ -165,8 +165,10 @@ inconclusive, though it is still worth guarding against.[^judge] Mitigations:
 - Use a judge from a different model family than the system under test.
 - **Calibrate against humans**: have experts label a sample and report the
   judge's agreement with them, chance-corrected (Cohen's kappa), before you rely
-  on its scores. The [Data Scientist track](/interview-prep/data-scientist/llm-evaluation)
-  works through that calculation.
+  on its scores. The bar is agreement about as high as the experts reach with
+  each other, the level Zheng et al. found GPT-4 reached.[^judge] The
+  [Data Scientist track](/interview-prep/data-scientist/llm-evaluation) works
+  through that calculation.
 
 ### How do you evaluate a RAG system?
 

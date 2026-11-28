@@ -223,7 +223,8 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     docs generate and serve, dbt_project.yml and its cascade, versions
  *     (v1.5+, ref with a version), dbt debug and profiles.yml.
  *  - "r-version-latest" (added by the second review, 2026-11-26) is dbt's
- *    documented behavior, not the page's, which stops at pinning: a ref
+ *    documented behavior, which the page has said too since 2026-11-28
+ *    (it stopped at pinning before): a ref
  *    with no version resolves to the model's latest_version, and that
  *    defaults to the highest version (docs.getdbt.com, "Model versions":
  *    "By default, the ref resolves to the latest version"; "If not

@@ -215,8 +215,9 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  * Second review (agent-outputs/20261126-ae-mle-video-review/): r-cumulative
  * is split in three and only its middle sentence re-voiced, because
  * month-to-date is a to-date window from the 1st, not a trailing one (dbt's
- * cumulative metrics: grain_to_date against window; the page lists both
- * under "a trailing window"). Question 4's LEFT JOIN row says its 0.00 is
+ * cumulative metrics: grain_to_date against window; the page listed both
+ * under "a trailing window" until it was corrected on 2026-11-28 and now
+ * names the two kinds). Question 4's LEFT JOIN row says its 0.00 is
  * COALESCE's (check.mjs chasm.fix), since a left join alone leaves NULL.
  *
  * Written for Drew's ear: SQL, BI, API and YAML in plain caps (SQL and YAML
