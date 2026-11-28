@@ -1,0 +1,147 @@
+name: Video releases (1080p)
+
+# Renders the Remotion videos in video/ at 1920x1080 and keeps them in GitHub
+# releases: one release per Studio folder (each course, each interview track,
+# and "videos-landscape" for the stand-alone videos), each video an asset
+# `<id>.mp4`. See video/scripts/video-releases.mjs.
+#
+# Nothing renders unless a video changed. A push to main that touches video/
+# starts this workflow, but the plan job only asks for videos whose inputs
+# differ from the fingerprint stored beside their copy in the release
+# (`<id>.fingerprint.json`): every source file the video imports, the shared
+# kit included, its narration and images, its Root.tsx entry, the dependency
+# versions and the render settings (render-all.mjs's fingerprint). A README
+# edit renders nothing; an edit to one scene renders that one video; an edit
+# to the shared editorial kit renders every video that imports it.
+#
+# The videos to render are packed into jobs of about 25 minutes of video each.
+# A 4-core runner renders 1080p at about 1.2 times real time with four frames
+# at once, so a job takes about half an hour, and a change to the shared kit
+# (every video, 13.4 hours of video, about 33 jobs) about an hour and a half
+# on 20 parallel runners. A manual run (Actions > this workflow > Run
+# workflow) can name videos, force them, or cap the run with `limit`; videos
+# over the cap are listed in the run's summary and left for the next run.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "video/**"
+      - "!video/**/*.md"
+      - "app/brand.css"
+      - ".github/workflows/video-releases.yml"
+  workflow_dispatch:
+    inputs:
+      only:
+        description: "Only these videos (composition ids or folders, comma-separated); empty for every changed video"
+        type: string
+        default: ""
+      force:
+        description: "Render them even if unchanged"
+        type: boolean
+        default: false
+      limit:
+        description: "Most videos to render in this run (0 for no limit)"
+        type: number
+        default: 0
+
+# One run at a time, never cancelled: a second push waits, then plans against
+# what the first one published.
+concurrency:
+  group: video-releases
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    outputs:
+      count: ${{ steps.plan.outputs.count }}
+      batches: ${{ steps.plan.outputs.batches }}
+      releases: ${{ steps.plan.outputs.releases }}
+    steps:
+      # Only video/ and app/ (for brand.css): the site's content and images
+      # are most of the repository and no video reads them.
+      - uses: actions/checkout@v7
+        with:
+          sparse-checkout: |
+            video
+            app
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "22"
+      - name: Plan the renders
+        id: plan
+        working-directory: video
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ONLY: ${{ inputs.only }}
+          FORCE: ${{ inputs.force }}
+          LIMIT: ${{ inputs.limit || 0 }}
+        run: |
+          args=(--limit "$LIMIT")
+          if [ -n "$ONLY" ]; then args+=(--only "$ONLY"); fi
+          if [ "$FORCE" = "true" ]; then args+=(--force); fi
+          node scripts/video-releases.mjs plan "${args[@]}"
+
+  render:
+    needs: plan
+    if: needs.plan.outputs.count != '0'
+    runs-on: ubuntu-latest
+    # A batch is about 25 minutes of video, about half an hour to render.
+    timeout-minutes: 150
+    strategy:
+      fail-fast: false
+      matrix:
+        batch: ${{ fromJSON(needs.plan.outputs.batches) }}
+    name: render ${{ matrix.batch.n }} (${{ matrix.batch.seconds }} s of video)
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          sparse-checkout: |
+            video
+            app
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: video/package-lock.json
+      - name: Install
+        working-directory: video
+        run: npm ci
+      - name: Render
+        working-directory: video
+        # Uploading is a step of its own, after this one whatever happens: a
+        # video that rendered is published even if another in the batch failed.
+        continue-on-error: true
+        run: node scripts/render-all.mjs --fhd --force --videos-only --concurrency 4 "${{ matrix.batch.ids }}"
+      - name: Upload to the releases
+        working-directory: video
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node scripts/video-releases.mjs upload "${{ matrix.batch.ids }}"
+
+  notes:
+    needs: [plan, render]
+    # After every render job, including failed ones: the notes say what each
+    # release holds, whatever this run managed to add to it.
+    if: always() && needs.plan.outputs.count != '0'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          sparse-checkout: |
+            video
+            app
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "22"
+      - name: Rewrite the release notes
+        working-directory: video
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node scripts/video-releases.mjs notes ${{ needs.plan.outputs.releases }}

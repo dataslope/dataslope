@@ -221,6 +221,39 @@ re-renders that unit's opener alone. The rendered openers are in
 the unit video, under the one opener, and Statistics Unit 5 is the merged
 `Stats-5-Sampling`.
 
+### The 1080p releases
+
+Every video is also published at 1080p as a GitHub release, by
+`.github/workflows/video-releases.yml`: one release per Studio folder
+(`videos-statistics`, `videos-interview-analytics-engineer`, …, and
+`videos-landscape` for the stand-alone videos), each video an asset
+`<id>.mp4`, with a table in the release notes of what each file is and the
+commit it was rendered from.
+
+**Only a changed video renders.** The workflow starts on a push to main that
+touches `video/` (Markdown aside), but beside each `<id>.mp4` its release
+keeps `<id>.fingerprint.json`, the `render:all` fingerprint the file was made
+from, and the plan job renders only the videos whose inputs no longer match
+it (`scripts/video-releases.mjs plan`, which runs `render-all.mjs --fhd
+--trust-manifest --dry-run` against the published fingerprints). A README
+edit renders nothing, an edit to one scene renders that video, and an edit
+to the shared kit renders every video that imports it. A video whose render
+or upload fails keeps its old fingerprint, so the next run tries it again.
+
+The videos to render are packed into parallel jobs of about 25 minutes of
+video each. A 4-core runner renders 1080p at about 1.2 times real time with
+four frames at once (20 s of video in 23.8 s, against 32.0 s with Remotion's
+default of two), so a job takes about half an hour, and all 118 videos (13.4
+hours of video, about 33 jobs) take about an hour and a half on 20 runners.
+A manual run (Actions, "Video releases (1080p)", Run workflow) can name
+videos (`only`), render them unchanged (`force`), or cap a run (`limit`); a
+video over the cap is listed in the run's summary and left for the next
+run. Releases in this public repository are public.
+
+```bash
+node scripts/video-releases.mjs releases     # the releases and their videos
+```
+
 ### Why the compositions are 1080p
 
 Every composition is laid out at 1920x1080 CSS pixels and

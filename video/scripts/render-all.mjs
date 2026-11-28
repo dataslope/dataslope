@@ -11,6 +11,17 @@
  *   npm run render:all -- --concurrency 12     # frames rendered at once
  *   npm run render:all -- --x264-preset medium # the encoder's speed/size trade
  *
+ * For CI (.github/workflows/video-releases.yml, which keeps the rendered
+ * videos in GitHub releases rather than in out/):
+ *
+ *   --manifest <file>   read and write this manifest, not out/.render-manifest.json
+ *   --trust-manifest    judge by the manifest alone: a video whose record
+ *                       matches is up to date with no output in out/ (it is in
+ *                       a release), and one with no record renders
+ *   --videos-only       the narrated videos alone, no openers
+ *   --plan <file>       write what would render as JSON, { todo: [{ id,
+ *                       folder, reason }], upToDate }, before rendering
+ *
  * Speed. Remotion renders `--concurrency` frames at once (default: half the
  * CPU's threads); try more with `npx remotion benchmark`. The H.264 encoder
  * runs at the x264 preset `fast` by default rather than x264's `medium`: at
@@ -71,8 +82,6 @@ const VIDEO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), ".
 const SRC = path.join(VIDEO_ROOT, "src");
 const PUBLIC = path.join(VIDEO_ROOT, "public");
 const OUT = path.join(VIDEO_ROOT, "out");
-const MANIFEST = path.join(OUT, ".render-manifest.json");
-
 const args = process.argv.slice(2);
 const flag = (name) => args.includes(name);
 const fhd = flag("--fhd");
@@ -83,12 +92,16 @@ if (fhd && hd) {
 }
 const dryRun = flag("--dry-run");
 const force = flag("--force");
+const trustManifest = flag("--trust-manifest");
+const videosOnly = flag("--videos-only");
 /** A flag's value: `--concurrency 12`. */
-const VALUED = ["--concurrency", "--x264-preset"];
+const VALUED = ["--concurrency", "--x264-preset", "--manifest", "--plan"];
 const value = (name) => {
   const i = args.indexOf(name);
   return i >= 0 ? args[i + 1] : undefined;
 };
+const MANIFEST = value("--manifest") ? path.resolve(value("--manifest")) : path.join(OUT, ".render-manifest.json");
+const PLAN = value("--plan") ? path.resolve(value("--plan")) : null;
 const only = args.find((a, i) => !a.startsWith("--") && !VALUED.includes(args[i - 1]))?.split(",");
 
 /** How many frames Remotion renders at once: a number, or Remotion's
@@ -247,7 +260,7 @@ const some = (names) => names.slice(0, 2).join(", ") + (names.length > 2 ? ` (+$
 
 // --- Plan ------------------------------------------------------------------
 
-let videos = [...registry(), ...EXTRAS];
+let videos = [...registry(), ...(videosOnly ? [] : EXTRAS)];
 if (only) {
   const wanted = new Set(only.map((n) => videoNames(n, videos).id));
   const unknown = [...wanted].filter((id) => !videos.some((v) => v.id === id));
@@ -275,9 +288,13 @@ for (const v of videos) {
   const output = outputOf(v.id);
   const before = manifest[key(v.id)];
   let reason = null;
+  const recordedHere = before && typeof before === "object";
   if (force) reason = "forced";
-  else if (!existsSync(output)) reason = "not rendered";
-  else if (before && typeof before === "object") {
+  // Trusting the manifest, a video is up to date only by its record: no
+  // record means not rendered, whatever happens to be in out/.
+  else if (trustManifest && !recordedHere) reason = "not rendered";
+  else if (!trustManifest && !existsSync(output)) reason = "not rendered";
+  else if (recordedHere) {
     // What it was rendered from: any file it reads now that differs.
     const changed = Object.keys(record.files).filter((f) => before.files?.[f] !== record.files[f]);
     if (before.meta !== record.meta) reason = "changed: its render settings or its entry in Root.tsx";
@@ -297,8 +314,13 @@ for (const v of videos) {
 const nRecorded = Object.keys(recorded).length;
 if (nRecorded && !dryRun) {
   Object.assign(manifest, recorded);
-  mkdirSync(OUT, { recursive: true });
+  mkdirSync(path.dirname(MANIFEST), { recursive: true });
   writeFileSync(MANIFEST, JSON.stringify(manifest, null, 2) + "\n");
+}
+if (PLAN) {
+  const plan = { todo: todo.map(({ id, folder, reason }) => ({ id, folder: folder ?? null, reason })), upToDate: videos.length - todo.length };
+  mkdirSync(path.dirname(PLAN), { recursive: true });
+  writeFileSync(PLAN, JSON.stringify(plan, null, 2) + "\n");
 }
 
 console.log(`${videos.length - todo.length} up to date, ${todo.length} to render.`);
